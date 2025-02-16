@@ -10,5 +10,7 @@ namespace DocSpot.Infrastructure.Data.Types
         public static Role Admin => new Role("Admin");
         public static Role Doctor => new Role("Doctor");
         public static Role Patient => new Role("Patient");
+
+        public override string ToString() => Value;
     }
 }
