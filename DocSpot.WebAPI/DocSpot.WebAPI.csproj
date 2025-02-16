@@ -28,8 +28,4 @@
     <ProjectReference Include="..\DocSpot.Core\DocSpot.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Api\" />
-  </ItemGroup>
-
 </Project>
