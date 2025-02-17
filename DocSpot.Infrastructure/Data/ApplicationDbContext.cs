@@ -21,6 +21,8 @@ namespace DocSpot.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new IdentityRoleConfiguration()); // seeds roles
+
             builder.ApplyConfiguration(new DoctorEntityConfiguration());
             builder.ApplyConfiguration(new PatientEntityConfiguration());
         }
