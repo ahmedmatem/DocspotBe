@@ -8,6 +8,7 @@
     using DocSpot.Infrastructure.Data;
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Types;
+    using DocSpot.Core.Contracts;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -15,21 +16,24 @@
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
-        private readonly ApplicationDbContext context;
+        private readonly IPatientService patientService;
         private readonly ILogger<AuthController> logger;
 
         public AuthController(
             UserManager<IdentityUser> _userManager,
             SignInManager<IdentityUser> _signInManager,
-            ApplicationDbContext _context,
+            IPatientService _patientService,
             ILogger<AuthController> _logger)
         {
             userManager = _userManager;
             signInManager = _signInManager;
-            context = _context;
+            patientService = _patientService;
             logger = _logger;
         }
 
+        /// <summary>
+        /// Used to register patients.
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
@@ -54,8 +58,7 @@
                 UserId = user.Id
             };
 
-            context.Patients.Add(patient);
-            await context.SaveChangesAsync();
+            await patientService.CreateAsync(patient);
 
             return Ok(SuccessMessage.PatientRegister);
         }

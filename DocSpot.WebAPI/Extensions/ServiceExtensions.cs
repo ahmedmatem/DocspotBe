@@ -5,11 +5,14 @@
 
     using DocSpot.Infrastructure.Data;
     using DocSpot.Infrastructure.Data.Repository;
+    using DocSpot.Core.Contracts;
+    using DocSpot.Core.Services;
 
     public static class ServiceExtensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            services.AddScoped<IPatientService, PatientService>();
 
             return services;
         }
