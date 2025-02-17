@@ -33,7 +33,12 @@
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var user = new IdentityUser() { UserName = model.Email, Email = model.Email };
+            var user = new IdentityUser() 
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber
+            };
             var result = await userManager.CreateAsync(user);
 
             if(!result.Succeeded)
