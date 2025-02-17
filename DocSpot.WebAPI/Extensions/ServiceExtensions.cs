@@ -4,6 +4,7 @@
     using Microsoft.EntityFrameworkCore;
 
     using DocSpot.Infrastructure.Data;
+    using DocSpot.Infrastructure.Data.Repository;
 
     public static class ServiceExtensions
     {
@@ -23,6 +24,8 @@
             {
                 options.UseSqlServer(connectionString);
             });
+
+            services.AddScoped<IRepository, Repository>();
 
             return services;
         }
