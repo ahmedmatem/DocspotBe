@@ -10,6 +10,7 @@ namespace DocSpot.Infrastructure.Data
 
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Configurations;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
 
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
@@ -17,12 +18,22 @@ namespace DocSpot.Infrastructure.Data
         {
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new IdentityRoleConfiguration()); // seeds roles
+            // data seeding
+            builder.ApplyConfiguration(new IdentityRoleConfiguration()); // roles
+            builder.ApplyConfiguration(new IdentityUserConfiguration()); // admin/user
+            builder.ApplyConfiguration(new IdentityUserRoleConfiguration()); // admin/user -> role
 
+            // entity configurations
             builder.ApplyConfiguration(new DoctorEntityConfiguration());
             builder.ApplyConfiguration(new PatientEntityConfiguration());
         }

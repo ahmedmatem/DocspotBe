@@ -197,8 +197,8 @@ namespace DocSpot.Infrastructure.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "59e7a7f0-84d7-4d5a-a59a-0d7eff4509c8",
-                            ConcurrencyStamp = "59e7a7f0-84d7-4d5a-a59a-0d7eff4509c8",
+                            Id = "7b04ce0e-72e0-4319-b73d-741c63bfc5ab",
+                            ConcurrencyStamp = "7b04ce0e-72e0-4319-b73d-741c63bfc5ab",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
@@ -306,6 +306,24 @@ namespace DocSpot.Infrastructure.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "2bf77050-c525-4ac5-a346-0061012b50d2",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "admin@gmail.com",
+                            NormalizedUserName = "admin@gmail.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDhFCw+XoMwxGDz3c1a1+wGrQ470mm6aAYRDCaCBXdGdNnYWRivvy7+43zWPpoacng==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@gmail.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -368,6 +386,13 @@ namespace DocSpot.Infrastructure.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
+                            RoleId = "7b04ce0e-72e0-4319-b73d-741c63bfc5ab"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
