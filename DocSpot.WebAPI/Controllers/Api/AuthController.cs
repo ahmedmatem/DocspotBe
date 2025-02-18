@@ -9,6 +9,7 @@
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Core.Contracts;
+    using System;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -61,6 +62,25 @@
             await patientService.CreateAsync(patient);
 
             return Ok(SuccessMessage.PatientRegister);
+        }
+
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if(user == null)
+                return Unauthorized(ErrorMessage.InvalidCredentials);
+
+            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            if (!result.Succeeded)
+                return Unauthorized(ErrorMessage.InvalidCredentials);
+
+            var token = GenerateJwtToken(user);
+            return Ok(new { Token = token });
+        }
+
+        private string GenerateJwtToken(IdentityUser user)
+        {
+            throw new NotImplementedException();
         }
     }
 }
