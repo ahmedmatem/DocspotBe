@@ -62,7 +62,7 @@
                 return BadRequest(result.Errors);
             }
 
-            await userManager.AddToRoleAsync(user, Role.Patient.ToString());
+            await userManager.AddToRoleAsync(user, Role.Patient);
 
             var patient = new Patient()
             {

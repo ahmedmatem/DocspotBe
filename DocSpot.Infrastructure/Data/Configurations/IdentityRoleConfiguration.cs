@@ -20,22 +20,22 @@ namespace DocSpot.Infrastructure.Data.Configurations
                 new IdentityRole()
                 {
                     Id = Constants.RoleAdminId,
-                    Name = Role.Admin.ToString(),
-                    NormalizedName = Role.Admin.ToString().ToUpper(),
+                    Name = Role.Admin,
+                    NormalizedName = Role.Admin,
                     ConcurrencyStamp = Constants.RoleAdminId,
                 },
                 new IdentityRole()
                 {
                     Id = Constants.RoleDoctorId,
-                    Name = Role.Doctor.ToString(),
-                    NormalizedName = Role.Doctor.ToString().ToUpper(),
+                    Name = Role.Doctor,
+                    NormalizedName = Role.Doctor.ToUpper(),
                     ConcurrencyStamp = Constants.RoleDoctorId,
                 },
                 new IdentityRole()
                 {
                     Id = Constants.RolePatientId,
-                    Name = Role.Patient.ToString(),
-                    NormalizedName = Role.Patient.ToString().ToUpper(),
+                    Name = Role.Patient,
+                    NormalizedName = Role.Patient.ToUpper(),
                     ConcurrencyStamp = Constants.RolePatientId,
                 },
             ];
