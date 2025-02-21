@@ -11,7 +11,6 @@
 
     using DocSpot.Core.Messages;
     using DocSpot.Core.Models.Account;
-    using DocSpot.Infrastructure.Data;
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Core.Contracts;
