@@ -13,7 +13,7 @@
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IPatientService, PatientService>();
-            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IDoctorService, DoctorService>();
 
             return services;
         }

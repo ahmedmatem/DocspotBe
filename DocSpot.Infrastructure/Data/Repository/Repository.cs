@@ -144,7 +144,7 @@
         /// <summary>
         /// Saves all made changes in trasaction
         /// </summary>
-        /// <returns>Error code</returns>
+        /// <returns>The task result contains the number of state entries written to the database.</returns>
         public async Task<int> SaveChangesAsync<T>() where T : class
         {
             return await context.SaveChangesAsync();

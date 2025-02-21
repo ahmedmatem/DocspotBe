@@ -1,18 +1,39 @@
 ﻿namespace DocSpot.WebAPI.Controllers.Api
 {
-    using DocSpot.Core.Models;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
-    [Authorize(Roles = "Doctor")]
+    using AutoMapper;
+
+    using DocSpot.Core.Models;
+    using DocSpot.Core.Contracts;
+    using DocSpot.Core.Messages;
+    using DocSpot.Infrastructure.Data.Types;
+    using DocSpot.Infrastructure.Data.Models;
+
+    [Authorize(Roles = Role.Doctor)]
     [Route("api/[controller]")]
     [ApiController]
     public class DoctorController : ControllerBase
     {
+        private readonly IMapper mapper;
+        private readonly IDoctorService doctorService;
+
+        public DoctorController(
+            IMapper _mapper,
+            IDoctorService _doctorService)
+        {
+            mapper = _mapper;
+            doctorService = _doctorService;
+        }
+
         [HttpPost("schedule")]
         public async Task<IActionResult> Schedule([FromBody] ScheduleModel model)
         {
+            var schedule = mapper.Map<Schedule>(model);
+            await doctorService.AddScheduleAsync(schedule);
 
+            return Ok(SuccessMessage.DoctorAddSchedule);
         }
     }
 }

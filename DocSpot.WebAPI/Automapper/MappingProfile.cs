@@ -2,8 +2,14 @@
 {
     using AutoMapper;
 
+    using DocSpot.Core.Models;
+    using DocSpot.Infrastructure.Data.Models;
+
     public class MappingProfile : Profile
     {
-        //CreateMap<TSource, TDestination>();
+        public MappingProfile()
+        {
+            CreateMap<ScheduleModel, Schedule>().ReverseMap();
+        }
     }
 }
