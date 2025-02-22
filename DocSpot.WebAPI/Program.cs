@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Identity;
 namespace DocSpot.WebAPI
 {
     using DocSpot.WebAPI.Extensions;
+    using Microsoft.OpenApi.Models;
 
     public class Program
     {
@@ -21,9 +21,11 @@ namespace DocSpot.WebAPI
 
             builder.Services.AddAutoMapper(typeof(Program));
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddApplicationAuthentication(builder.Configuration);
+
+            // Configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddApplicationSwaggerGen();
 
             var app = builder.Build();
 

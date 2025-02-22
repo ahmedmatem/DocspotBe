@@ -1,12 +1,19 @@
-﻿namespace DocSpot.WebAPI.Extensions
+﻿#nullable disable
+namespace DocSpot.WebAPI.Extensions
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.IdentityModel.Tokens;
 
     using DocSpot.Infrastructure.Data;
     using DocSpot.Infrastructure.Data.Repository;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Services;
+    using System.Text;
+    using System.Security.Claims;
+    using System.IdentityModel.Tokens.Jwt;
+    using Microsoft.OpenApi.Models;
 
     public static class ServiceExtensions
     {
@@ -14,6 +21,36 @@
         {
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<IDoctorService, DoctorService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddApplicationAuthentication(
+            this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtSettings = configuration.GetSection("JwtSettings");
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Issuer"],
+                        ValidAudience = jwtSettings["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
+                        RoleClaimType = ClaimTypes.Role // Ensure role claims are recognized
+                    };
+                });
 
             return services;
         }
@@ -41,6 +78,42 @@
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            return services;
+        }
+
+        public static IServiceCollection AddApplicationSwaggerGen(
+            this IServiceCollection services)
+        {
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "DocSpot API", Version = "v1" });
+
+                // **Add JWT authentication to Swagger**
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "Enter 'Bearer YOUR_TOKEN_HERE' (without quotes)",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {} // No scopes required
+                    }
+                });
+            });
 
             return services;
         }

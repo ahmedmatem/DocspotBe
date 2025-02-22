@@ -1,4 +1,5 @@
-﻿namespace DocSpot.WebAPI.Controllers.Api
+﻿#nullable disable
+namespace DocSpot.WebAPI.Controllers.Api
 {
     using System;
     using System.Security.Claims;
@@ -14,6 +15,7 @@
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Core.Contracts;
+    using NuGet.Packaging;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -66,8 +68,8 @@
 
             var patient = new Patient()
             {
+                UserId = user.Id,
                 Name = model.Name,
-                UserId = user.Id
             };
 
             await patientService.CreateAsync(patient);
@@ -82,7 +84,8 @@
             if(user == null)
                 return Unauthorized(ErrorMessage.InvalidCredentials);
 
-            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            // Validate password without creating a session
+            var result = await signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (!result.Succeeded)
                 return Unauthorized(ErrorMessage.InvalidCredentials);
 
@@ -94,14 +97,24 @@
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
 
-            var claims = new[]
+            // Get user userRoles
+            var userRoles = userManager.GetRolesAsync(user).Result;
+            var claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                //new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                //new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+                //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]!));
+            // Add userRoles as claim
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim("role", role));
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(

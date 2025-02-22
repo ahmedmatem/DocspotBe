@@ -17,10 +17,16 @@
             repository = _repository;
         }
 
-        public async Task CreateAsync(Patient patient)
+        /// <summary>
+        /// Add entity to the database
+        /// </summary>
+        /// <param name="patient">Entity to add</param>
+        /// <returns>The task result contains the number of state entries 
+        /// written to the database.</returns>
+        public async Task<int> CreateAsync(Patient patient)
         {
             await repository.AddAsync(patient);
-            await repository.SaveChangesAsync<Patient>();
+            return await repository.SaveChangesAsync<Patient>();
         }
     }
 }

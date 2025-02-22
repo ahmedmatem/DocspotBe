@@ -11,9 +11,9 @@
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Infrastructure.Data.Models;
 
-    [Authorize(Roles = Role.Doctor)]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = Role.Doctor)]
     public class DoctorController : ControllerBase
     {
         private readonly IMapper mapper;

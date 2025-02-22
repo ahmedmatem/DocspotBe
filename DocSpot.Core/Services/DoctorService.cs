@@ -15,15 +15,28 @@
         }
 
         /// <summary>
-        /// Add entity ti the database
+        /// Add entity to the database
         /// </summary>
         /// <param name="schedule">Entity to add</param>
-        /// <returns>The task result contains the number of state entries written to the database.</returns>
+        /// <returns>The task result contains the number of state entries 
+        /// written to the database.</returns>
         public async Task<int> AddScheduleAsync(Schedule schedule)
         {
             await repository.AddAsync(schedule);
             return await repository.SaveChangesAsync<Schedule>();
 
+        }
+
+        /// <summary>
+        /// Add entity to the database
+        /// </summary>
+        /// <param name="doctor">Entity to add</param>
+        /// <returns>The task result contains the number of state entries 
+        /// written to the database.</returns>
+        public async Task<int> CreateAsync(Doctor doctor)
+        {
+            await repository.AddAsync(doctor);
+            return await repository.SaveChangesAsync<Doctor>();
         }
     }
 }
