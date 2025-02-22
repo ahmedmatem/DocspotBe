@@ -1,19 +1,19 @@
 ﻿#nullable disable
 namespace DocSpot.WebAPI.Extensions
 {
+    using System.Text;
+    using System.Security.Claims;
+
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.IdentityModel.Tokens;
+    using Microsoft.OpenApi.Models;
 
     using DocSpot.Infrastructure.Data;
     using DocSpot.Infrastructure.Data.Repository;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Services;
-    using System.Text;
-    using System.Security.Claims;
-    using System.IdentityModel.Tokens.Jwt;
-    using Microsoft.OpenApi.Models;
 
     public static class ServiceExtensions
     {

@@ -2,12 +2,12 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Identity;
 
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Core.Models.Account;
     using DocSpot.Core.Messages;
     using DocSpot.Infrastructure.Data.Models;
-    using Microsoft.AspNetCore.Identity;
     using DocSpot.Core.Contracts;
 
     [Route("api/[controller]")]

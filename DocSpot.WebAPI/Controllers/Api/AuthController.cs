@@ -15,7 +15,6 @@ namespace DocSpot.WebAPI.Controllers.Api
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Core.Contracts;
-    using NuGet.Packaging;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -101,9 +100,6 @@ namespace DocSpot.WebAPI.Controllers.Api
             var userRoles = userManager.GetRolesAsync(user).Result;
             var claims = new List<Claim>()
             {
-                //new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                //new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
