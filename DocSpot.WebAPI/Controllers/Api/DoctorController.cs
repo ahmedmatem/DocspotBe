@@ -27,6 +27,9 @@
             doctorService = _doctorService;
         }
 
+        /// <summary>
+        /// Add a schedule
+        /// </summary>
         [HttpPost("schedule")]
         public async Task<IActionResult> Schedule([FromBody] ScheduleModel model)
         {
@@ -34,6 +37,25 @@
             await doctorService.AddScheduleAsync(schedule);
 
             return Ok(SuccessMessage.DoctorAddSchedule);
+        }
+
+        [HttpGet("schedule/{date}")]
+        public async Task<IActionResult> Schedule(string doctorId, string date)
+        {
+            var schedule = await doctorService.GetScheduleAsync(doctorId, date);
+            if (schedule == null)
+                return StatusCode(StatusCodes.Status204NoContent);
+
+            return Ok(schedule);
+        }
+
+        [HttpGet("schedule-range/{startDate}-{endDate}")]
+        public Task<IActionResult> ScheduleRange(
+            string doctorId,
+            string startDate,
+            string endDate)
+        {
+            throw new NotImplementedException();
         }
     }
 }

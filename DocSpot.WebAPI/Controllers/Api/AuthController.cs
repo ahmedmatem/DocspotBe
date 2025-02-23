@@ -100,8 +100,8 @@ namespace DocSpot.WebAPI.Controllers.Api
             var userRoles = userManager.GetRolesAsync(user).Result;
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.NameIdentifier, user.Id)
             };
 
             // Add userRoles as claim
