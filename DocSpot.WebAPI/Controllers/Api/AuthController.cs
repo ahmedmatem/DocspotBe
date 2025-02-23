@@ -107,7 +107,7 @@ namespace DocSpot.WebAPI.Controllers.Api
             // Add userRoles as claim
             foreach (var role in userRoles)
             {
-                claims.Add(new Claim("role", role));
+                claims.Add(new(ClaimTypes.Role, role));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));

@@ -5,6 +5,7 @@
     using DocSpot.Core.Contracts;
     using DocSpot.Infrastructure.Data.Repository;
     using DocSpot.Infrastructure.Data.Models;
+    using Microsoft.EntityFrameworkCore;
 
     public class PatientService : IPatientService
     {
@@ -27,6 +28,11 @@
         {
             await repository.AddAsync(patient);
             return await repository.SaveChangesAsync<Patient>();
+        }
+
+        public async Task<Patient?> GetByIdAsync(string patientId)
+        {
+            return await repository.GetByIdAsync<Patient>(patientId);
         }
     }
 }
