@@ -49,13 +49,16 @@
             return Ok(schedule);
         }
 
-        [HttpGet("schedule-range/{startDate}-{endDate}")]
-        public Task<IActionResult> ScheduleRange(
+        [HttpGet("schedule-range/{startDate}/{endDate}")]
+        public async Task<IActionResult> ScheduleRange(
             string doctorId,
             string startDate,
             string endDate)
         {
-            throw new NotImplementedException();
+            var schedules = await doctorService
+                .GetScheduleRangeAsync(doctorId, startDate, endDate);
+
+            return Ok(schedules);
         }
     }
 }

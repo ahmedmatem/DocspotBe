@@ -1,7 +1,6 @@
 ﻿namespace DocSpot.Core.Services
 {
     using System.Globalization;
-    using System.Linq;
 
     using Microsoft.EntityFrameworkCore;
 
@@ -44,11 +43,6 @@
             return await repository.SaveChangesAsync<Doctor>();
         }
 
-        public IQueryable<Doctor> GetDoctorByUserId(string userId)
-        {
-            return repository.AllReadonly<Doctor>(d => d.UserId == userId);
-        }
-
         public async Task<Schedule?> GetScheduleAsync(string doctorId, string date)
         {
             var dateTime = DateTime
@@ -68,7 +62,7 @@
             var startDateTime = DateTime
                 .ParseExact(startDate, Constants.DateTimeFormat, CultureInfo.InvariantCulture);
             var endDateTime = DateTime
-                .ParseExact(startDate, Constants.DateTimeFormat, CultureInfo.InvariantCulture);
+                .ParseExact(endDate, Constants.DateTimeFormat, CultureInfo.InvariantCulture);
 
             return await repository
                 .AllReadonly<Schedule>(s => startDateTime <= s.Date && s.Date <= endDateTime)
