@@ -1,5 +1,7 @@
 ﻿namespace DocSpot.Core.Services
 {
+    using System.Collections.Generic;
+
     using Microsoft.Extensions.Logging;
 
     using DocSpot.Core.Contracts;
@@ -28,6 +30,16 @@
         {
             await repository.AddAsync(patient);
             return await repository.SaveChangesAsync<Patient>();
+        }
+
+        public async Task<IEnumerable<Appointment>> GetAppointments(string patientId)
+        {
+            var patient = await repository
+                .AllReadonly<Patient>(p => p.Id == patientId)
+                .Include(p => p.Appointments)
+                .FirstOrDefaultAsync();
+
+            return patient?.Appointments ?? [];
         }
 
         public async Task<Patient?> GetByIdAsync(string patientId)

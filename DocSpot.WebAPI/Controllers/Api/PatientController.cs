@@ -37,5 +37,21 @@
 
             return Ok(patient);
         }
+
+        [HttpGet("appointments/{id}")]
+        public async Task<IActionResult> Appointments(string id)
+        {
+            var patient = await patientService.GetByIdAsync(id);
+            if (patient == null)
+                return NotFound();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (patient.UserId != userId)
+                return Unauthorized();
+
+            var appointments = await patientService.GetAppointments(id);
+
+            return Ok(appointments);
+        }
     }
 }

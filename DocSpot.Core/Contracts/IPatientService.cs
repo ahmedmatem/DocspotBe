@@ -13,5 +13,7 @@
         public Task<int> CreateAsync(Patient patient);
 
         public Task<Patient?> GetByIdAsync(string patientId);
+
+        public Task<IEnumerable<Appointment>> GetAppointments(string patientId);
     }
 }
