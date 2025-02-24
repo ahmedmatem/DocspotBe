@@ -21,6 +21,7 @@ namespace DocSpot.WebAPI.Extensions
         {
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<IDoctorService, DoctorService>();
+            services.AddScoped<IAppointmentsService, AppointmentsService>();
 
             return services;
         }
