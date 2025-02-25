@@ -29,5 +29,17 @@
 
             return Ok(occupiedSlots);
         }
+
+        [HttpGet("occupied-slots-range/{startDate}/{endDate}")]
+        public async Task<IActionResult> GetOccupiedSlotsInRange(
+            string doctorId,
+            string startDate,
+            string endDate)
+        {
+            var occupiedSlotsInRange = await appointmentsService
+                .AppointmentsInRange(doctorId, startDate, endDate);
+
+            return Ok(occupiedSlotsInRange);
+        }
     }
 }

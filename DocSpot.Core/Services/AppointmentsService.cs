@@ -6,6 +6,7 @@
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Repository;
     using Microsoft.EntityFrameworkCore;
+    using static System.Runtime.InteropServices.JavaScript.JSType;
 
     public class AppointmentsService : IAppointmentsService
     {
@@ -32,9 +33,43 @@
                     app => app.ScheduleId,
                     sch => sch.Id,
                     (appointment, schedule) => new { appointment, schedule })
-                .Where(joined => joined.appointment.AppointmentDate == dateTime 
+                .Where(
+                    joined => joined.appointment.AppointmentDate == dateTime
                     && joined.schedule.DoctorId == doctorId)
                 .Select(joined => joined.appointment)
+                .OrderBy(app => app.AppointmentTime)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Get only all appointments for given range [startDate, endDate] and for schedule that belongs to the doctor with doctorId.
+        /// </summary>
+        /// <param name="doctorId">The identifier of the doctor which the schedule belongs to.</param>
+        /// <param name="startDate">The start date in the range.</param>
+        /// <param name="endDate">The end date in the range.</param>
+        /// <returns>Appointments for given doctor within date-range.</returns>
+        public async Task<IEnumerable<Appointment>> AppointmentsInRange(
+            string doctorId,
+            string startDate,
+            string endDate)
+        {
+            var startDateTime = DateTime.ParseExact(
+                startDate, Constants.DateTimeFormat, CultureInfo.InvariantCulture);
+            var endDateTime = DateTime.ParseExact(
+                endDate, Constants.DateTimeFormat, CultureInfo.InvariantCulture);
+
+            return await repository.AllReadOnly<Appointment>()
+                .Join(repository.AllReadOnly<Schedule>(),
+                    app => app.ScheduleId,
+                    sch => sch.Id,
+                    (appointment, schedule) => new { appointment, schedule })
+                .Where(joined => 
+                    startDateTime <= joined.appointment.AppointmentDate
+                    && joined.appointment.AppointmentDate <= endDateTime
+                    && joined.schedule.DoctorId == doctorId)
+                .Select(joined => joined.appointment)
+                .OrderBy(app => app.AppointmentDate)
+                .ThenBy(app => app.AppointmentTime)
                 .ToListAsync();
         }
     }
