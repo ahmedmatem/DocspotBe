@@ -5,6 +5,9 @@
 
     using DocSpot.Infrastructure.Data.Types;
     using DocSpot.Core.Contracts;
+    using DocSpot.Core.Models;
+    using AutoMapper;
+    using DocSpot.Infrastructure.Data.Models;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -13,13 +16,16 @@
     {
         private readonly ILogger<AppointmentsController> logger;
         private readonly IAppointmentsService appointmentsService;
+        private readonly IMapper mapper;
 
         public AppointmentsController(
             ILogger<AppointmentsController> _logger,
-            IAppointmentsService _appointmentsService)
+            IAppointmentsService _appointmentsService,
+            IMapper _mapper)
         {
             logger = _logger;
             appointmentsService = _appointmentsService;
+            mapper = _mapper;
         }
 
         [HttpGet("occupied-slots/{date}")]
@@ -40,6 +46,20 @@
                 .AppointmentsInRange(doctorId, startDate, endDate);
 
             return Ok(occupiedSlotsInRange);
+        }
+
+        [HttpPost("book")]
+        public async Task<IActionResult> Book([FromBody] AppointmentModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var appointment = mapper.Map<Appointment>(model);
+            await appointmentsService.Book(appointment);
+
+            return Ok(appointment.Id);
         }
     }
 }

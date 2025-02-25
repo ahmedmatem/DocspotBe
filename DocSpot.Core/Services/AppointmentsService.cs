@@ -2,11 +2,11 @@
 {
     using System.Globalization;
 
+    using Microsoft.EntityFrameworkCore;
+
     using DocSpot.Core.Contracts;
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Repository;
-    using Microsoft.EntityFrameworkCore;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
 
     public class AppointmentsService : IAppointmentsService
     {
@@ -71,6 +71,12 @@
                 .OrderBy(app => app.AppointmentDate)
                 .ThenBy(app => app.AppointmentTime)
                 .ToListAsync();
+        }
+
+        public async Task Book(Appointment appointment)
+        {
+            await repository.AddAsync(appointment);
+            await repository.SaveChangesAsync<Appointment>();
         }
     }
 }
