@@ -8,6 +8,7 @@
     using DocSpot.Core.Models;
     using AutoMapper;
     using DocSpot.Infrastructure.Data.Models;
+    using Microsoft.AspNetCore.Http.HttpResults;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -60,6 +61,14 @@
             await appointmentsService.Book(appointment);
 
             return Ok(appointment.Id);
+        }
+
+        [HttpDelete("cancel/{id}")]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            await appointmentsService.Cancel(id);
+
+            return Ok();
         }
     }
 }

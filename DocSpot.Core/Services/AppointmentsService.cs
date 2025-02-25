@@ -78,5 +78,11 @@
             await repository.AddAsync(appointment);
             await repository.SaveChangesAsync<Appointment>();
         }
+
+        public async Task Cancel(string appointmentId)
+        {
+            await repository.DeleteAsync<Appointment>(appointmentId);
+            await repository.SaveChangesAsync<Appointment>();
+        }
     }
 }

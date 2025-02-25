@@ -9,5 +9,7 @@
         public Task<IEnumerable<Appointment>> AppointmentsInRange(string doctorId, string startDate, string endDate);
 
         public Task Book(Appointment appointment);
+
+        public Task Cancel(string appointmentId);
     }
 }
