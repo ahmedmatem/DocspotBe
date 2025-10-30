@@ -9,20 +9,17 @@
 
     public class Appointment : BaseModel
     {
-        [Required]
-        [Comment("The date of the appointment")]
+
+        public required string PatientName { get; set; }
+
+        public required string PatientPhone { get; set; }
+
+        public required string PatientEmail { get; set; }
+
         public required DateTime AppointmentDate { get; set; }
 
-        [Required]
-        [Comment("The time of the appointment")]
         public required TimeSpan AppointmentTime { get; set; }
 
-        [ForeignKey(nameof(Patient))]
-        public required string PatientId { get; set; }
-        public required Patient Patient { get; set; }
-
-        [ForeignKey(nameof(Schedule))]
-        public required string ScheduleId { get; set; }
-        public required Schedule Schedule { get; set; }
+        public string? Message { get; set; }
     }
 }

@@ -44,12 +44,6 @@ namespace DocSpot.Infrastructure.Data
             return base.SaveChangesAsync(cancellationToken);
         }
 
-        public DbSet<Doctor> Doctors { get; set; }
-
-        public DbSet<Patient> Patients { get; set; }
-
         public DbSet<Appointment> Appointments { get; set; }
-
-        public DbSet<Schedule> Schedules { get; set; }
     }
 }

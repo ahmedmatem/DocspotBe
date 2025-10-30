@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocSpot.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250217185102_AddModels")]
-    partial class AddModels
+    [Migration("20251030155844_AddAppointment")]
+    partial class AddAppointment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,12 +31,10 @@ namespace DocSpot.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("AppointmentDate")
-                        .HasColumnType("datetime2")
-                        .HasComment("The date of the appointment");
+                        .HasColumnType("datetime2");
 
                     b.Property<TimeSpan>("AppointmentTime")
-                        .HasColumnType("time")
-                        .HasComment("The time of the appointment");
+                        .HasColumnType("time");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -50,12 +48,25 @@ namespace DocSpot.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PatientId")
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientEmail")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ScheduleId")
+                    b.Property<string>("PatientName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScheduleId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -97,7 +108,7 @@ namespace DocSpot.Infrastructure.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Doctors");
+                    b.ToTable("Doctor");
                 });
 
             modelBuilder.Entity("DocSpot.Infrastructure.Data.Models.Patient", b =>
@@ -130,7 +141,7 @@ namespace DocSpot.Infrastructure.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Patients");
+                    b.ToTable("Patient");
                 });
 
             modelBuilder.Entity("DocSpot.Infrastructure.Data.Models.Schedule", b =>
@@ -168,7 +179,7 @@ namespace DocSpot.Infrastructure.Data.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("Schedules");
+                    b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -196,6 +207,29 @@ namespace DocSpot.Infrastructure.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "7b04ce0e-72e0-4319-b73d-741c63bfc5ab",
+                            ConcurrencyStamp = "7b04ce0e-72e0-4319-b73d-741c63bfc5ab",
+                            Name = "Admin",
+                            NormalizedName = "Admin"
+                        },
+                        new
+                        {
+                            Id = "6455d797-d71d-4587-963d-0c7c4ac69420",
+                            ConcurrencyStamp = "6455d797-d71d-4587-963d-0c7c4ac69420",
+                            Name = "Doctor",
+                            NormalizedName = "DOCTOR"
+                        },
+                        new
+                        {
+                            Id = "f64eeef7-bf35-4b8d-9db6-ace187b9f20e",
+                            ConcurrencyStamp = "f64eeef7-bf35-4b8d-9db6-ace187b9f20e",
+                            Name = "Patient",
+                            NormalizedName = "PATIENT"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -286,6 +320,24 @@ namespace DocSpot.Infrastructure.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "a7ff268c-d700-4941-a0e1-c2c8f1b72486",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "admin@gmail.com",
+                            NormalizedUserName = "admin@gmail.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL3c6hwUhFx7ei5/Sxij9IbJLYWDDGWZGLt2lbdrichsaHyt3PxWekPqalgnLK1lcg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@gmail.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -348,6 +400,13 @@ namespace DocSpot.Infrastructure.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
+                            RoleId = "7b04ce0e-72e0-4319-b73d-741c63bfc5ab"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -371,21 +430,13 @@ namespace DocSpot.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("DocSpot.Infrastructure.Data.Models.Appointment", b =>
                 {
-                    b.HasOne("DocSpot.Infrastructure.Data.Models.Patient", "Patient")
+                    b.HasOne("DocSpot.Infrastructure.Data.Models.Patient", null)
                         .WithMany("Appointments")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PatientId");
 
-                    b.HasOne("DocSpot.Infrastructure.Data.Models.Schedule", "Schedule")
+                    b.HasOne("DocSpot.Infrastructure.Data.Models.Schedule", null)
                         .WithMany("Appointments")
-                        .HasForeignKey("ScheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-
-                    b.Navigation("Schedule");
+                        .HasForeignKey("ScheduleId");
                 });
 
             modelBuilder.Entity("DocSpot.Infrastructure.Data.Models.Doctor", b =>
