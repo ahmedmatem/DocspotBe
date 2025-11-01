@@ -12,7 +12,7 @@
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Role.Patient)]
+    //[Authorize(Roles = Role.Patient)]
     public class AppointmentsController : ControllerBase
     {
         private readonly ILogger<AppointmentsController> logger;

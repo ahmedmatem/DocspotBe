@@ -30,14 +30,14 @@
         /// <summary>
         /// Add a schedule
         /// </summary>
-        [HttpPost("schedule")]
-        public async Task<IActionResult> Schedule([FromBody] ScheduleModel model)
-        {
-            var schedule = mapper.Map<Schedule>(model);
-            await doctorService.AddScheduleAsync(schedule);
+        //[HttpPost("schedule")]
+        //public async Task<IActionResult> Schedule([FromBody] ScheduleModel model)
+        //{
+        //    var schedule = mapper.Map<Schedule>(model);
+        //    await doctorService.AddScheduleAsync(schedule);
 
-            return Ok(SuccessMessage.DoctorAddSchedule);
-        }
+        //    return Ok(SuccessMessage.DoctorAddSchedule);
+        //}
 
         [HttpGet("schedule/{date}")]
         public async Task<IActionResult> Schedule(string doctorId, string date)

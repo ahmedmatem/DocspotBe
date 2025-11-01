@@ -9,7 +9,6 @@
     {
         public MappingProfile()
         {
-            CreateMap<ScheduleModel, Schedule>().ReverseMap();
             CreateMap<AppointmentModel, Appointment>().ReverseMap();
         }
     }
