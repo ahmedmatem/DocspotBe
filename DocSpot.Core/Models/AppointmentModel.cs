@@ -1,4 +1,6 @@
-﻿namespace DocSpot.Core.Models
+﻿using DocSpot.Infrastructure.Data.Types;
+
+namespace DocSpot.Core.Models
 {
     public class AppointmentModel
     {
@@ -8,9 +10,11 @@
 
         public required string PatientEmail { get; set; }
 
-        public required DateTime AppointmentDate { get; set; }
+        public required string VisitType { get; set; }
 
-        public required TimeSpan AppointmentTime { get; set; }
+        public required DateOnly AppointmentDate { get; set; }
+
+        public required TimeOnly AppointmentTime { get; set; }
 
         public string? Message { get; set; }
     }

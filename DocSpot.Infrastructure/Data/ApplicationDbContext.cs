@@ -28,14 +28,14 @@ namespace DocSpot.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            // data seeding
-            builder.ApplyConfiguration(new IdentityRoleConfiguration()); // roles
-            builder.ApplyConfiguration(new IdentityUserConfiguration()); // admin/user
-            builder.ApplyConfiguration(new IdentityUserRoleConfiguration()); // admin/user -> role
+            //// data seeding
+            //builder.ApplyConfiguration(new IdentityRoleConfiguration()); // roles
+            //builder.ApplyConfiguration(new IdentityUserConfiguration()); // admin/user
+            //builder.ApplyConfiguration(new IdentityUserRoleConfiguration()); // admin/user -> role
 
-            // entity configurations
-            builder.ApplyConfiguration(new DoctorEntityConfiguration());
-            builder.ApplyConfiguration(new PatientEntityConfiguration());
+            //// entity configurations
+            //builder.ApplyConfiguration(new DoctorEntityConfiguration());
+            //builder.ApplyConfiguration(new PatientEntityConfiguration());
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

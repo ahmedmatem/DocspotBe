@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DocSpot.Infrastructure.Data.Migrations
+namespace DocSpot.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Identity : Migration

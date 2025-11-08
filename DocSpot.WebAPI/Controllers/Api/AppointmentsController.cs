@@ -29,28 +29,28 @@
             mapper = _mapper;
         }
 
-        [HttpGet("occupied-slots/{date}")]
-        public async Task<IActionResult> GetOccupiedSlots(string doctorId, string date)
-        {
-            var occupiedSlots = await appointmentsService.Appointments(doctorId, date);
+        //[HttpGet("occupied-slots/{date}")]
+        //public async Task<IActionResult> GetOccupiedSlots(string doctorId, string date)
+        //{
+        //    var occupiedSlots = await appointmentsService.Appointments(doctorId, date);
 
-            return Ok(occupiedSlots);
-        }
+        //    return Ok(occupiedSlots);
+        //}
 
-        [HttpGet("occupied-slots-range/{startDate}/{endDate}")]
-        public async Task<IActionResult> GetOccupiedSlotsInRange(
-            string doctorId,
-            string startDate,
-            string endDate)
-        {
-            var occupiedSlotsInRange = await appointmentsService
-                .AppointmentsInRange(doctorId, startDate, endDate);
+        //[HttpGet("occupied-slots-range/{startDate}/{endDate}")]
+        //public async Task<IActionResult> GetOccupiedSlotsInRange(
+        //    string doctorId,
+        //    string startDate,
+        //    string endDate)
+        //{
+        //    var occupiedSlotsInRange = await appointmentsService
+        //        .AppointmentsInRange(doctorId, startDate, endDate);
 
-            return Ok(occupiedSlotsInRange);
-        }
+        //    return Ok(occupiedSlotsInRange);
+        //}
 
         [HttpPost("book")]
-        public async Task<IActionResult> Book([FromBody] AppointmentModel model)
+        public async Task<IActionResult> Book(AppointmentModel model)
         {
             if (!ModelState.IsValid)
             {

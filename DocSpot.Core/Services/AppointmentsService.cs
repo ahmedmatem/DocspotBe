@@ -8,7 +8,7 @@
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Repository;
 
-    public class AppointmentsService
+    public class AppointmentsService : IAppointmentsService
     {
         private readonly IRepository repository;
 
