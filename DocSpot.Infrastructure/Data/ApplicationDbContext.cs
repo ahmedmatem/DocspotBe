@@ -36,6 +36,8 @@ namespace DocSpot.Infrastructure.Data
             //// entity configurations
             //builder.ApplyConfiguration(new DoctorEntityConfiguration());
             //builder.ApplyConfiguration(new PatientEntityConfiguration());
+            builder.ApplyConfiguration(new WeekScheduleCfg());
+            builder.ApplyConfiguration(new WeekScheduleIntervalCfg());
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -43,6 +45,10 @@ namespace DocSpot.Infrastructure.Data
             this.ApplyAuditInfoRules();
             return base.SaveChangesAsync(cancellationToken);
         }
+
+        public DbSet<WeekSchedule> WeekSchedules { get; set; }
+
+        public DbSet<WeekScheduleInterval> WeekScheduleIntervals { get; set; }
 
         public DbSet<Appointment> Appointments { get; set; }
     }

@@ -1,14 +1,15 @@
 ﻿namespace DocSpot.WebAPI.Controllers.Api
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Identity;
-
-    using DocSpot.Infrastructure.Data.Types;
-    using DocSpot.Core.Models.Account;
-    using DocSpot.Core.Messages;
-    using DocSpot.Infrastructure.Data.Models;
+    using DocSpot.Core.AppExceptions;
     using DocSpot.Core.Contracts;
+    using DocSpot.Core.Messages;
+    using DocSpot.Core.Models;
+    using DocSpot.Core.Models.Account;
+    using DocSpot.Infrastructure.Data.Models;
+    using DocSpot.Infrastructure.Data.Types;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -18,14 +19,32 @@
         private readonly UserManager<IdentityUser> userManager;
         private readonly PasswordHasher<IdentityUser> passwordHasher;
         private readonly IDoctorService doctorService;
+        private readonly IScheduleService scheduleService;
 
         public AdminController(
             UserManager<IdentityUser> _userManager,
-            IDoctorService _doctorService)
+            IDoctorService _doctorService,
+            IScheduleService _scheduleService)
         {
             userManager = _userManager;
             doctorService = _doctorService;
             passwordHasher = new PasswordHasher<IdentityUser>();
+            scheduleService = _scheduleService;
+        }
+
+        [HttpPost("week-schedule")]
+        public async Task<IActionResult> CreateWeekSchedule(WeekScheduleDto dto, CancellationToken ct)
+        {
+            try
+            {
+                var id = await scheduleService.CreateWeekScheduleAsync(dto, ct);
+                // Optionally add a GET and use CreatedAtAction; for now Ok is fine:
+                return Ok(new { id });
+            }
+            catch (ScheduleValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPost("register-doctor")]
@@ -58,5 +77,6 @@
 
             return Ok(SuccessMessage.DoctorRegister);
         }
+
     }
 }
