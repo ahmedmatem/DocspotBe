@@ -29,9 +29,9 @@ namespace DocSpot.Infrastructure.Data
             base.OnModelCreating(builder);
 
             //// data seeding
-            //builder.ApplyConfiguration(new IdentityRoleConfiguration()); // roles
-            //builder.ApplyConfiguration(new IdentityUserConfiguration()); // admin/user
-            //builder.ApplyConfiguration(new IdentityUserRoleConfiguration()); // admin/user -> role
+            builder.ApplyConfiguration(new IdentityRoleConfiguration()); // roles
+            builder.ApplyConfiguration(new IdentityUserConfiguration()); // admin/user
+            builder.ApplyConfiguration(new IdentityUserRoleConfiguration()); // admin/user -> role
 
             //// entity configurations
             //builder.ApplyConfiguration(new DoctorEntityConfiguration());

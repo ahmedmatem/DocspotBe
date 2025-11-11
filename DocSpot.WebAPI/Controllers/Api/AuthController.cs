@@ -63,17 +63,19 @@ namespace DocSpot.WebAPI.Controllers.Api
                 return BadRequest(result.Errors);
             }
 
-            await userManager.AddToRoleAsync(user, Role.Patient);
+            //await userManager.AddToRoleAsync(user, Role.Patient);
 
-            var patient = new Patient()
-            {
-                UserId = user.Id,
-                Name = model.Name,
-            };
+            //var patient = new Patient()
+            //{
+            //    UserId = user.Id,
+            //    Name = model.Name,
+            //};
 
-            await patientService.CreateAsync(patient);
+            //await patientService.CreateAsync(patient);
 
-            return Ok(SuccessMessage.PatientRegister);
+            //return Ok(SuccessMessage.PatientRegister);
+
+            return Created();
         }
 
         [HttpPost("login")]
@@ -88,8 +90,21 @@ namespace DocSpot.WebAPI.Controllers.Api
             if (!result.Succeeded)
                 return Unauthorized(ErrorMessage.InvalidCredentials);
 
+            var roles = await userManager.GetRolesAsync(user);
+
             var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
+
+            var loginResponse = new
+            {
+                AccessToken = token,
+                user = new 
+                {
+                    id = user.Id,
+                    email = model.Email,
+                    role = roles[0].ToLower()
+                }
+            };
+            return Ok(loginResponse);
         }
 
         private string GenerateJwtToken(IdentityUser user)
