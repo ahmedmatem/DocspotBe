@@ -32,6 +32,9 @@
 
         Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class;
 
+        Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        where T : class;
+
         /// <summary>
         /// Updates a record in database
         /// </summary>
@@ -79,5 +82,7 @@
         /// </summary>
         /// <returns>Error code</returns>
         Task<int> SaveChangesAsync<T>() where T : class;
+
+        Task<int> SaveChangesAsync<T>(CancellationToken ct = default) where T : class;
     }
 }

@@ -4,6 +4,7 @@ using DocSpot.Core.Models;
 using DocSpot.Infrastructure.Data.Models;
 using DocSpot.Infrastructure.Data.Repository;
 using DocSpot.Infrastructure.Data.Types;
+using Microsoft.EntityFrameworkCore;
 
 namespace DocSpot.Core.Services
 {
@@ -21,6 +22,14 @@ namespace DocSpot.Core.Services
             if (!DateOnly.TryParse(dto.StartDate, out var startDate))
             {
                 throw new ScheduleValidationException("Invalid startDate. Expectedyyyy-mm-dd.");
+            }
+
+            var exists = await repository
+                .AnyAsync<WeekSchedule>(ws => ws.StartDate == startDate, ct);
+            if (exists)
+            {
+                throw new ScheduleValidationException(
+                    $"A schedule with startDate {startDate:yyyy-MM-dd} already exists.");
             }
 
             if (dto.SlotLength <= 0)
@@ -75,7 +84,7 @@ namespace DocSpot.Core.Services
             };
 
             await repository.AddAsync(entity);
-            await repository.SaveChangesAsync<WeekSchedule>();
+            await repository.SaveChangesAsync<WeekSchedule>(ct);
 
             return entity.Id;
         }

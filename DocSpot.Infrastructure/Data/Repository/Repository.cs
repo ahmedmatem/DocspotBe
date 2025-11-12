@@ -1,7 +1,7 @@
 ﻿namespace DocSpot.Infrastructure.Data.Repository
 {
     using System.Linq.Expressions;
-
+    using System.Threading;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -61,6 +61,9 @@
         {
             await DbSet<T>().AddRangeAsync(entities);
         }
+
+        public Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default) where T : class
+            => DbSet<T>().AnyAsync(predicate, ct);
 
         /// <summary>
         /// Updates a record in database
@@ -148,6 +151,11 @@
         public async Task<int> SaveChangesAsync<T>() where T : class
         {
             return await context.SaveChangesAsync();
+        }
+
+        public async Task<int> SaveChangesAsync<T>(CancellationToken ct) where T : class
+        {
+            return await context.SaveChangesAsync(ct);
         }
 
         /// <summary>

@@ -38,7 +38,7 @@
             try
             {
                 var id = await scheduleService.CreateWeekScheduleAsync(dto, ct);
-                // Optionally add a GET and use CreatedAtAction; for now Ok is fine:
+
                 return Ok(new { id });
             }
             catch (ScheduleValidationException ex)
