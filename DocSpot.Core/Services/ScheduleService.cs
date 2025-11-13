@@ -1,10 +1,11 @@
-﻿using DocSpot.Core.Exceptions;
-using DocSpot.Core.Contracts;
+﻿using DocSpot.Core.Contracts;
+using DocSpot.Core.Exceptions;
 using DocSpot.Core.Models;
 using DocSpot.Infrastructure.Data.Models;
 using DocSpot.Infrastructure.Data.Repository;
 using DocSpot.Infrastructure.Data.Types;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace DocSpot.Core.Services
 {
@@ -119,8 +120,9 @@ namespace DocSpot.Core.Services
                     weekDict[dayKey].Add(ToRangeString(interval.Start, interval.End));
                 }
 
-                result.Add(new WeekScheduleDto {
-                    StartDate = weekSchedule.StartDate.ToString("yyyy-mm-dd"),
+                result.Add(new WeekScheduleDto
+                {
+                    StartDate = weekSchedule.StartDate.ToString("yyyy-MM-dd"),
                     SlotLength = weekSchedule.SlotLengthMinutes,
                     WeekSchedule = weekDict
                 });
@@ -170,8 +172,13 @@ namespace DocSpot.Core.Services
         };
 
         private static string ToRangeString(TimeSpan start, TimeSpan end)
+        {
             // "HH:mm" style formatting for TimeSpan:
-            => $"{start:HH\\:mm}-{end:HH\\:mm}";
+            var startStr = start.ToString(@"hh\:mm");
+            var endStr = end.ToString(@"hh\:mm");
+
+            return $"{startStr}-{endStr}";
+        }
         #endregion
     }
 }
