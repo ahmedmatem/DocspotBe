@@ -1,4 +1,4 @@
-﻿using DocSpot.Core.AppExceptions;
+﻿using DocSpot.Core.Exceptions;
 using DocSpot.Core.Contracts;
 using DocSpot.Core.Models;
 using DocSpot.Infrastructure.Data.Models;
@@ -89,6 +89,46 @@ namespace DocSpot.Core.Services
             return entity.Id;
         }
 
+        public async Task<IReadOnlyList<WeekScheduleDto>> GetAllWeekSchedulesWithIntervalsAsync(CancellationToken ct = default)
+        {
+            var entities = await repository.AllReadOnly<WeekSchedule>()
+                .Include(ws => ws.Intervals)
+                .OrderBy(ws => ws.StartDate) // oldest first
+                .ToListAsync(ct);
+
+            var result = new List<WeekScheduleDto>(entities.Count);
+
+            foreach (var weekSchedule in entities)
+            {
+                // prepare dictionary with all days so frontend can rely on keys being present
+                var weekDict = new Dictionary<string, List<string>>()
+                {
+                    ["mon"] = new(),
+                    ["tue"] = new(),
+                    ["wed"] = new(),
+                    ["thu"] = new(),
+                    ["fri"] = new(),
+                    ["sat"] = new(),
+                    ["sun"] = new(),
+                };
+                foreach (var interval in weekSchedule.Intervals
+                                                        .OrderBy(x => x.Day)
+                                                        .ThenBy(x => x.Start))
+                {
+                    var dayKey = ToDayKey(interval.Day); // 1 -> mon, 2 -> tue, ...
+                    weekDict[dayKey].Add(ToRangeString(interval.Start, interval.End));
+                }
+
+                result.Add(new WeekScheduleDto {
+                    StartDate = weekSchedule.StartDate.ToString("yyyy-mm-dd"),
+                    SlotLength = weekSchedule.SlotLengthMinutes,
+                    WeekSchedule = weekDict
+                });
+            }
+
+            return result;
+        }
+
         #region HELPERS
         private static bool TryParseRange(string s, out TimeSpan start, out TimeSpan end)
         {
@@ -116,6 +156,22 @@ namespace DocSpot.Core.Services
             };
             return day != 0;
         }
+
+        private static string ToDayKey(DayOfWeekIso weekDay) => weekDay switch
+        {
+            DayOfWeekIso.Mon => "mon",
+            DayOfWeekIso.Tue => "tue",
+            DayOfWeekIso.Wed => "wed",
+            DayOfWeekIso.Thu => "thu",
+            DayOfWeekIso.Fri => "fri",
+            DayOfWeekIso.Sat => "sat",
+            DayOfWeekIso.Sun => "sun",
+            _ => throw new ArgumentOutOfRangeException(nameof(weekDay), weekDay, null)
+        };
+
+        private static string ToRangeString(TimeSpan start, TimeSpan end)
+            // "HH:mm" style formatting for TimeSpan:
+            => $"{start:HH\\:mm}-{end:HH\\:mm}";
         #endregion
     }
 }

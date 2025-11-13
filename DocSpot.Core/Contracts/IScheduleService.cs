@@ -9,5 +9,12 @@ namespace DocSpot.Core.Contracts
         /// Throws ScheduleValidationException for bad input.
         /// </summary>
         public Task<string> CreateWeekScheduleAsync(WeekScheduleDto dto, CancellationToken ct = default);
+
+        /// <summary>
+        /// Gett all weekly schedule including intervals.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public Task<IReadOnlyList<WeekScheduleDto>> GetAllWeekSchedulesWithIntervalsAsync(CancellationToken ct = default);
     }
 }

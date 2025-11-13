@@ -1,4 +1,4 @@
-﻿namespace DocSpot.Core.AppExceptions
+﻿namespace DocSpot.Core.Exceptions
 {
     public class ScheduleValidationException : ApplicationException
     {

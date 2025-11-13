@@ -1,6 +1,6 @@
 ﻿namespace DocSpot.WebAPI.Controllers.Api
 {
-    using DocSpot.Core.AppExceptions;
+    using DocSpot.Core.Exceptions;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Messages;
     using DocSpot.Core.Models;
@@ -30,6 +30,14 @@
             doctorService = _doctorService;
             passwordHasher = new PasswordHasher<IdentityUser>();
             scheduleService = _scheduleService;
+        }
+
+        // GET api/admin/all-week-schedule
+        [HttpGet("all-week-schedule")]
+        public async Task<IActionResult> GetAll(CancellationToken ct)
+        {
+            var list = await scheduleService.GetAllWeekSchedulesWithIntervalsAsync(ct);
+            return Ok(list);
         }
 
         [HttpPost("week-schedule")]
