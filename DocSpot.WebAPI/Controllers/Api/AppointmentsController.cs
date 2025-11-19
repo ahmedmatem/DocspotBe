@@ -1,14 +1,15 @@
 ﻿namespace DocSpot.WebAPI.Controllers.Api
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-
-    using DocSpot.Infrastructure.Data.Types;
-    using DocSpot.Core.Contracts;
-    using DocSpot.Core.Models;
     using AutoMapper;
+    using DocSpot.Core.Contracts;
+    using DocSpot.Core.Exceptions;
+    using DocSpot.Core.Models;
     using DocSpot.Infrastructure.Data.Models;
+    using DocSpot.Infrastructure.Data.Types;
+    using Humanizer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http.HttpResults;
+    using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -17,15 +18,18 @@
     {
         private readonly ILogger<AppointmentsController> logger;
         private readonly IAppointmentsService appointmentsService;
+        private readonly IScheduleService scheduleService;
         private readonly IMapper mapper;
 
         public AppointmentsController(
             ILogger<AppointmentsController> _logger,
             IAppointmentsService _appointmentsService,
+            IScheduleService _scheduleService,
             IMapper _mapper)
         {
             logger = _logger;
             appointmentsService = _appointmentsService;
+            scheduleService = _scheduleService;
             mapper = _mapper;
         }
 
@@ -48,6 +52,22 @@
 
         //    return Ok(occupiedSlotsInRange);
         //}
+
+        [HttpGet("time-slots")]
+        public async Task<IActionResult> GetSlots(
+            [FromQuery] string date, CancellationToken ct)
+        {
+            try
+            {
+                var slots = await scheduleService.GetSlotsByDate(date, ct);
+
+                return Ok(slots);
+            }
+            catch (ScheduleValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }            
+        } 
 
         [HttpPost("book")]
         public async Task<IActionResult> Book(AppointmentModel model)

@@ -6,6 +6,7 @@ using DocSpot.Infrastructure.Data.Repository;
 using DocSpot.Infrastructure.Data.Types;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using static DocSpot.Core.Constants;
 
 namespace DocSpot.Core.Services
 {
@@ -22,7 +23,7 @@ namespace DocSpot.Core.Services
         {
             if (!DateOnly.TryParse(dto.StartDate, out var startDate))
             {
-                throw new ScheduleValidationException("Invalid startDate. Expectedyyyy-mm-dd.");
+                throw new ScheduleValidationException("Invalid startDate. Expected yyyy-mm-dd.");
             }
 
             var exists = await repository
@@ -33,9 +34,9 @@ namespace DocSpot.Core.Services
                     $"A schedule with startDate {startDate:yyyy-MM-dd} already exists.");
             }
 
-            if (dto.SlotLength <= 0)
+            if (dto.SlotLength <= 0 || dto.SlotLength >= TimeSlotMaxLengthMinutes)
             {
-                throw new ScheduleValidationException("Slot length must be > 0.");
+                throw new ScheduleValidationException("Slot length must 0 < be < 60.");
             }
 
             var intervals = new List<WeekScheduleInterval>();
@@ -131,7 +132,75 @@ namespace DocSpot.Core.Services
             return result;
         }
 
+        public async Task<IReadOnlyList<SlotDto>> GetSlotsByDate(string date, CancellationToken ct)
+        {
+            if(!TryParseDayOnly(date, out DateOnly dateOnly))
+            {
+                throw new ScheduleValidationException($"Date: {date} - Invalid date format. Expected yyyy-MM-dd.");
+            }
+
+            var activeWS = await GetActiveWeekScheduleAsync(dateOnly, ct);
+
+            if(activeWS == null)
+            {
+                throw new ScheduleValidationException($"No active week schedule found for date: {date}");
+            }
+
+            // This is the weekday of the *requested date*, not the schedule start
+            var requestedIsoDay = ToIsoDay(dateOnly);
+            var dayKey = ToDayKey(requestedIsoDay);
+
+            // get only intervals for that weekday
+            var intervalsForDay = activeWS.Intervals
+                .Where(x => x.Day == requestedIsoDay)
+                .OrderBy(x => x.Start)
+                .ThenBy(x => x.End)
+                .ToList();
+
+            var result = new List<SlotDto>();
+
+            if (!intervalsForDay.Any())
+            {
+                // no working hours for that day → return empty list
+                return result;
+            }
+
+            // length of each slot in the interval
+            var slotLengthTS = TimeSpan.FromMinutes(activeWS.SlotLengthMinutes);
+
+            foreach (var interval in intervalsForDay)
+            {
+                // Start from interval.Start, keep adding slotLength
+                // until the slot end would go past interval.End.
+                for (var current = interval.Start;
+                     current + slotLengthTS <= interval.End;
+                     current += slotLengthTS)
+                {
+                    result.Add(new SlotDto
+                    {
+                        Time = current.ToString(@"hh\:mm"),
+                        Available = true,
+                        // if needed:
+                        // DayKey = dayKey,
+                        // Date = dateOnly,
+                    });
+                }
+            }
+
+            return result;
+        }
+
         #region HELPERS
+
+        private Task<WeekSchedule?> GetActiveWeekScheduleAsync(DateOnly date, CancellationToken ct)
+        {
+            return repository.AllReadOnly<WeekSchedule>()
+                .Include(ws => ws.Intervals)
+                .Where(ws => ws.StartDate <= date)
+                .OrderByDescending(ws => ws.StartDate) // closest, but not after
+                .FirstOrDefaultAsync(ct);
+        }
+
         private static bool TryParseRange(string s, out TimeSpan start, out TimeSpan end)
         {
             start = default; end = default;
@@ -171,6 +240,33 @@ namespace DocSpot.Core.Services
             _ => throw new ArgumentOutOfRangeException(nameof(weekDay), weekDay, null)
         };
 
+        private static DayOfWeekIso ToIsoDay(DateOnly date)
+        {
+            return date.DayOfWeek switch
+            {
+                DayOfWeek.Monday => DayOfWeekIso.Mon,
+                DayOfWeek.Tuesday => DayOfWeekIso.Tue,
+                DayOfWeek.Wednesday => DayOfWeekIso.Wed,
+                DayOfWeek.Thursday => DayOfWeekIso.Thu,
+                DayOfWeek.Friday => DayOfWeekIso.Fri,
+                DayOfWeek.Saturday => DayOfWeekIso.Sat,
+                DayOfWeek.Sunday => DayOfWeekIso.Sun,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        private static string ToDayKey(DateOnly date) => date.DayOfWeek switch
+        {
+            DayOfWeek.Monday => "mon",
+            DayOfWeek.Tuesday => "tue",
+            DayOfWeek.Wednesday => "wed",
+            DayOfWeek.Thursday => "thu",
+            DayOfWeek.Friday => "fri",
+            DayOfWeek.Saturday => "sat",
+            DayOfWeek.Sunday => "sun",
+            _ => throw new ArgumentOutOfRangeException(nameof(date), date, null)
+        };
+
         private static string ToRangeString(TimeSpan start, TimeSpan end)
         {
             // "HH:mm" style formatting for TimeSpan:
@@ -178,6 +274,16 @@ namespace DocSpot.Core.Services
             var endStr = end.ToString(@"hh\:mm");
 
             return $"{startStr}-{endStr}";
+        }
+
+        private static bool TryParseDayOnly(string dateStr, out DateOnly dateOnly)
+        {
+            return DateOnly.TryParseExact(
+                dateStr, 
+                "yyyy-MM-dd", 
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None, 
+                out dateOnly);
         }
         #endregion
     }
