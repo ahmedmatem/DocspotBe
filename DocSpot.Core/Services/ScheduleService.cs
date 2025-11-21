@@ -214,18 +214,20 @@ namespace DocSpot.Core.Services
 
         private static bool TryParseDay(string key, out DayOfWeekIso day)
         {
-            day = key.ToLowerInvariant() switch
+            var parsed = key.ToLowerInvariant() switch
             {
-                "mon" => DayOfWeekIso.Mon,
-                "tue" => DayOfWeekIso.Tue,
-                "wed" => DayOfWeekIso.Wed,
-                "thu" => DayOfWeekIso.Thu,
-                "fri" => DayOfWeekIso.Fri,
-                "sat" => DayOfWeekIso.Sat,
-                "sun" => DayOfWeekIso.Sun,
-                _ => 0
+                "mon" => (true, DayOfWeekIso.Mon),
+                "tue" => (true, DayOfWeekIso.Tue),
+                "wed" => (true, DayOfWeekIso.Wed),
+                "thu" => (true, DayOfWeekIso.Thu),
+                "fri" => (true, DayOfWeekIso.Fri),
+                "sat" => (true, DayOfWeekIso.Sat),
+                "sun" => (true, DayOfWeekIso.Sun),
+                _ => (false, default(DayOfWeekIso))
             };
-            return day != 0;
+
+            day = parsed.Item2;
+            return parsed.Item1;
         }
 
         private static string ToDayKey(DayOfWeekIso weekDay) => weekDay switch
