@@ -132,6 +132,7 @@ namespace DocSpot.Core.Services
             return result;
         }
 
+        /// <inheritdoc/>
         public async Task<IReadOnlyList<SlotDto>> GetSlotsByDate(string date, CancellationToken ct)
         {
             if(!TryParseDayOnly(date, out DateOnly dateOnly))
@@ -192,6 +193,23 @@ namespace DocSpot.Core.Services
 
         #region HELPERS
 
+        /// <summary>
+        /// Retrieves the active <see cref="WeekSchedule"/> for the specified date.
+        /// </summary>
+        /// <param name="date">
+        /// The reference date for which to find the active week schedule. The method selects
+        /// the most recent <see cref="WeekSchedule"/> whose <c>StartDate</c> is less than
+        /// or equal to this date.
+        /// </param>
+        /// <param name="ct">
+        /// A cancellation token that can be used to cancel the asynchronous operation.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the
+        /// closest <see cref="WeekSchedule"/> whose <c>StartDate</c> is less than or equal
+        /// to the specified <paramref name="date"/>, including its intervals, or <c>null</c>
+        /// if no such schedule exists.
+        /// </returns>
         private Task<WeekSchedule?> GetActiveWeekScheduleAsync(DateOnly date, CancellationToken ct)
         {
             return repository.AllReadOnly<WeekSchedule>()

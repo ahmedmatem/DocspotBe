@@ -18,14 +18,24 @@ namespace DocSpot.Core.Contracts
         public Task<IReadOnlyList<WeekScheduleDto>> GetAllWeekSchedulesWithIntervalsAsync(CancellationToken ct = default);
 
         /// <summary>
-        /// Returns the list of slots for the specified date, indicating availability.
+        /// Generates all available time slots for a given date based on the active week schedule.
         /// </summary>
         /// <param name="date">
-        /// The target date for which to get slots. Expected in ISO 8601 date format: "yyyy-MM-dd".
-        /// Implementations should interpret this date according to the schedule's anchoring logic
-        /// (e.g., map to the configured week that contains the date).
+        /// The target date for which to generate time slots, in <c>yyyy-MM-dd</c> format.
         /// </param>
-        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <param name="ct">
+        /// A cancellation token that can be used to cancel the asynchronous operation.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a read-only list of
+        /// <see cref="SlotDto"/> instances representing all generated slots for the specified date.
+        /// If there are no working intervals for that day, an empty list is returned.
+        /// </returns>
+        /// <exception cref="ScheduleValidationException">
+        /// Thrown when the <paramref name="date"/> is not in the expected <c>yyyy-MM-dd</c> format,
+        /// or when no active week schedule exists for the given date.
+        /// </exception>
+
         public Task<IReadOnlyList<SlotDto>> GetSlotsByDate(string date, CancellationToken ct);
     }
 }
