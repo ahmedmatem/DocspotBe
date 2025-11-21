@@ -2,7 +2,7 @@
 
 namespace DocSpot.Core.Models
 {
-    public class AppointmentModel
+    public class AppointmentViewModel
     {
         public required string PatientName { get; set; }
 

@@ -5,10 +5,6 @@
     using DocSpot.Core.Exceptions;
     using DocSpot.Core.Models;
     using DocSpot.Infrastructure.Data.Models;
-    using DocSpot.Infrastructure.Data.Types;
-    using Humanizer;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http.HttpResults;
     using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]")]
@@ -59,9 +55,19 @@
         {
             try
             {
-                var slots = await scheduleService.GetSlotsByDate(date, ct);
+                var slotsForDate = await scheduleService.GetSlotsByDate(date, ct);
+                var appointmentsForDate = await appointmentsService.GetAllByDate(date, ct);
+                var bookedSlots = appointmentsForDate.Select(a => a.AppointmentTime.ToString("HH:mm"));
 
-                return Ok(slots);
+                foreach (var slot in slotsForDate)
+                {
+                    if (bookedSlots.Contains(slot.Time))
+                    {
+                        slot.Available = false;
+                    }
+                }
+
+                return Ok(slotsForDate);
             }
             catch (ScheduleValidationException ex)
             {
@@ -70,7 +76,7 @@
         } 
 
         [HttpPost("book")]
-        public async Task<IActionResult> Book(AppointmentModel model)
+        public async Task<IActionResult> Book(AppointmentViewModel model)
         {
             if (!ModelState.IsValid)
             {

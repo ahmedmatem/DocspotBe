@@ -5,11 +5,11 @@
     using DocSpot.Core.Models;
     using DocSpot.Infrastructure.Data.Models;
 
-    public class MappingProfile : Profile
+    public class WebMappingProfile : Profile
     {
-        public MappingProfile()
+        public WebMappingProfile()
         {
-            CreateMap<AppointmentModel, Appointment>().ReverseMap();
+            CreateMap<AppointmentViewModel, Appointment>().ReverseMap();
         }
     }
 }

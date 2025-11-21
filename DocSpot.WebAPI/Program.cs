@@ -1,5 +1,7 @@
 namespace DocSpot.WebAPI
 {
+    using DocSpot.Core.Automapper;
+    using DocSpot.WebAPI.Automapper;
     using DocSpot.WebAPI.Extensions;
     using Microsoft.OpenApi.Models;
 
@@ -19,7 +21,9 @@ namespace DocSpot.WebAPI
 
             builder.Services.AddApplicationServices();
 
-            builder.Services.AddAutoMapper(typeof(Program));
+            builder.Services.AddAutoMapper(
+                typeof(WebMappingProfile).Assembly,
+                typeof(CoreMappingProfile).Assembly);
 
             builder.Services.AddApplicationAuthentication(builder.Configuration);
 

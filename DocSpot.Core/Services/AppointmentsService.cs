@@ -1,20 +1,26 @@
 ﻿namespace DocSpot.Core.Services
 {
-    using System.Globalization;
-
-    using Microsoft.EntityFrameworkCore;
-
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using DocSpot.Core.Contracts;
+    using DocSpot.Core.Models;
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Repository;
+    using Microsoft.EntityFrameworkCore;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using static System.Runtime.InteropServices.JavaScript.JSType;
 
     public class AppointmentsService : IAppointmentsService
     {
         private readonly IRepository repository;
+        private readonly IMapper mapper;
 
-        public AppointmentsService(IRepository _repository)
+        public AppointmentsService(IRepository _repository, IMapper _mapper)
         {
             repository = _repository;
+            mapper = _mapper;
         }
 
         /// <summary>
@@ -77,6 +83,25 @@
         {
             await repository.AddAsync(appointment);
             await repository.SaveChangesAsync<Appointment>();
+        }
+
+        /// <inheritdoc/>
+        public async Task<IReadOnlyList<AppointmentDto>> GetAllByDate(string dateStr, CancellationToken ct)
+        {
+            try
+            {
+                var date = DateOnly.ParseExact(dateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+                return await repository.AllReadOnly<Appointment>()
+                    .Where(a => a.AppointmentDate == date)
+                    .ProjectTo<AppointmentDto>(mapper.ConfigurationProvider)
+                    .OrderBy(a => a.AppointmentTime)
+                    .ToListAsync(ct);
+            }
+            catch (FormatException ex)
+            {
+                throw new FormatException($"Date '{dateStr}' is not in the expected format 'yyyy-MM-dd'.", ex);
+            }
         }
 
         public async Task Cancel(string appointmentId)
