@@ -1,8 +1,10 @@
 namespace DocSpot.WebAPI
 {
     using DocSpot.Core.Automapper;
+    using DocSpot.Infrastructure.Data;
     using DocSpot.WebAPI.Automapper;
     using DocSpot.WebAPI.Extensions;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.OpenApi.Models;
 
     public class Program
@@ -32,6 +34,13 @@ namespace DocSpot.WebAPI
             builder.Services.AddApplicationSwaggerGen();
 
             var app = builder.Build();
+
+            // Run Migration
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            //    db.Database.Migrate();
+            //}
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
