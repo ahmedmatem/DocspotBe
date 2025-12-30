@@ -83,10 +83,10 @@
                 return BadRequest("Invalid data.");
             }
 
-            var appointment = mapper.Map<Appointment>(model);
-            await appointmentsService.Book(appointment);
+            var appointmentDto = mapper.Map<AppointmentDto>(model);
+            var id = await appointmentsService.Book(appointmentDto);
 
-            return Ok(appointment.Id);
+            return Ok(id);
         }
 
         [HttpDelete("cancel/{id}")]

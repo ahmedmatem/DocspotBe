@@ -65,7 +65,7 @@ namespace DocSpot.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("DocSpot.Infrastructure.Data.Models.WeekSchedule", b =>
@@ -96,7 +96,7 @@ namespace DocSpot.Infrastructure.Migrations
                     b.HasIndex("StartDate")
                         .IsUnique();
 
-                    b.ToTable("WeekSchedules");
+                    b.ToTable("WeekSchedules", (string)null);
                 });
 
             modelBuilder.Entity("DocSpot.Infrastructure.Data.Models.WeekScheduleInterval", b =>
@@ -134,7 +134,7 @@ namespace DocSpot.Infrastructure.Migrations
                     b.HasIndex("WeekScheduleId", "Day", "Start", "End")
                         .IsUnique();
 
-                    b.ToTable("WeekScheduleIntervals");
+                    b.ToTable("WeekScheduleIntervals", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

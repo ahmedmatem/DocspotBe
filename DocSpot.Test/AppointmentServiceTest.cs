@@ -1,4 +1,5 @@
 using AutoMapper;
+using DocSpot.Core.Models;
 using DocSpot.Core.Services;
 using DocSpot.Infrastructure.Data;
 using DocSpot.Infrastructure.Data.Models;
@@ -30,22 +31,22 @@ namespace DocSpot.Test
         public void BookTest()
         {
             // Arrange
-            var appointment = new Appointment()
+            var appointment = new AppointmentDto()
             {
                 PatientName = "Ahmed",
                 PatientPhone = "1231231",
                 PatientEmail = "a@a.b",
-                VisitType = VisitType.PAID,
+                VisitType = VisitType.PAID.ToString(),
                 AppointmentDate = new DateOnly(),
                 AppointmentTime = new TimeOnly()
             };
 
-            var appointment1 = new Appointment()
+            var appointment1 = new AppointmentDto()
             {
                 PatientName = "Ahmed",
                 PatientPhone = "1231231",
                 PatientEmail = "a@a.b",
-                VisitType = VisitType.PAID,
+                VisitType = VisitType.PAID.ToString(),
                 AppointmentDate = new DateOnly().AddDays(1),
                 AppointmentTime = new TimeOnly()
             };

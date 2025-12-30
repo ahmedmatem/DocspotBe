@@ -1,11 +1,6 @@
 ﻿namespace DocSpot.Infrastructure.Data.Models
 {
-    using System.ComponentModel.DataAnnotations;
-
-    using Microsoft.EntityFrameworkCore;
-
     using DocSpot.Infrastructure.Data.Abstracts;
-    using System.ComponentModel.DataAnnotations.Schema;
     using DocSpot.Infrastructure.Data.Types;
 
     public class Appointment : BaseModel

@@ -4,6 +4,8 @@ namespace DocSpot.Core.Models
 {
     public class AppointmentDto
     {
+        public string Id { get; set; } = null!;
+
         public required string PatientName { get; set; }
 
         public required string PatientPhone { get; set; }

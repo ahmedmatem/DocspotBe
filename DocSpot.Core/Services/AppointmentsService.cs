@@ -79,10 +79,14 @@
         //        .ToListAsync();
         //}
 
-        public async Task Book(Appointment appointment)
+        public async Task<string> Book(AppointmentDto appointmentDto)
         {
+            var appointment = mapper.Map<Appointment>(appointmentDto);
+            appointment.Id = Guid.NewGuid().ToString();
             await repository.AddAsync(appointment);
             await repository.SaveChangesAsync<Appointment>();
+
+            return appointment.Id;
         }
 
         /// <inheritdoc/>

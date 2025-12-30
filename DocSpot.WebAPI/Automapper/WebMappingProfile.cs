@@ -9,7 +9,7 @@
     {
         public WebMappingProfile()
         {
-            CreateMap<AppointmentViewModel, Appointment>().ReverseMap();
+            CreateMap<AppointmentViewModel, AppointmentDto>().ReverseMap();
         }
     }
 }
