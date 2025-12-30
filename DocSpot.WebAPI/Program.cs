@@ -21,7 +21,7 @@ namespace DocSpot.WebAPI
 
             builder.Services.AddControllers();
 
-            builder.Services.AddApplicationServices();
+            builder.Services.AddApplicationServices(builder.Configuration);
 
             builder.Services.AddAutoMapper(
                 typeof(WebMappingProfile).Assembly,

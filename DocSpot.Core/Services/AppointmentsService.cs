@@ -79,10 +79,11 @@
         //        .ToListAsync();
         //}
 
-        public async Task<string> Book(AppointmentDto appointmentDto)
+        public async Task<string> Book(AppointmentDto appointmentDto, CancellationToken ct)
         {
             var appointment = mapper.Map<Appointment>(appointmentDto);
             appointment.Id = Guid.NewGuid().ToString();
+
             await repository.AddAsync(appointment);
             await repository.SaveChangesAsync<Appointment>();
 
