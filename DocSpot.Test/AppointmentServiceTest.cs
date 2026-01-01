@@ -58,8 +58,8 @@ namespace DocSpot.Test
             };
 
             // Act
-            await appointmentsService.Book(appointment);
-            await appointmentsService.Book(appointment1);
+            await appointmentsService.Book(appointment, CancellationToken.None);
+            await appointmentsService.Book(appointment1, CancellationToken.None);
 
             var appList = repository.All<Appointment>().ToList();
             

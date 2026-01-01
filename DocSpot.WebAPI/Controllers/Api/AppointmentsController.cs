@@ -4,8 +4,10 @@
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Exceptions;
     using DocSpot.Core.Models;
+    using DocSpot.Core.Helpers;
     using DocSpot.Core.Services;
     using DocSpot.Infrastructure.Data.Models;
+    using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Mvc;
     using Org.BouncyCastle.Ocsp;
 
@@ -88,14 +90,18 @@
                 return BadRequest("Invalid data.");
             }
 
-            // Save appointment to DB
             var appointmentDto = mapper.Map<AppointmentDto>(model);
-            var id = await appointmentsService.Book(appointmentDto, ct);
+            appointmentDto.PublicToken = TokenHelper.GenerateUrlSafeToken();
+            appointmentDto.CancelToken = TokenHelper.GenerateUrlSafeToken();
+            appointmentDto.AppointmentStatus = AppointmentStatus.Done;
+
+            // Save appointment to DB
+            appointmentDto.Id = await appointmentsService.Book(appointmentDto, ct);
 
             // Send confirmation email
             await emailService.SendAppointmentConfirmationAsync(appointmentDto, ct);
 
-            return Ok(id);
+            return Ok(appointmentDto.Id);
         }
 
         [HttpDelete("cancel/{id}")]

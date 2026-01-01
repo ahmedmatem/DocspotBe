@@ -19,5 +19,21 @@
         public required TimeOnly AppointmentTime { get; set; }
 
         public string? Message { get; set; }
+
+        // Email confirmation status
+        public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
+
+        // Use to confirm link valid for (e.g.) 2 hours after booking
+        // Store hashes only (not raw tokens)
+        public string? PublicTokenHash { get; set; }
+
+        public DateTime? TokenExpireAtUtc { get; set; }
+
+        // Cancel token
+        public string? CancelTokenHash { get; set; }
+
+        public DateTime? CancelTokenExpireAtUtc { get; set; }
+
+        public DateTime? CancelledAtUtc { get; set; }
     }
 }
