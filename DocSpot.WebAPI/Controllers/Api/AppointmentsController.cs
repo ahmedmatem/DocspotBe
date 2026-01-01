@@ -4,8 +4,12 @@
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Exceptions;
     using DocSpot.Core.Models;
+    using DocSpot.Core.Helpers;
+    using DocSpot.Core.Services;
     using DocSpot.Infrastructure.Data.Models;
+    using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Mvc;
+    using Org.BouncyCastle.Ocsp;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -15,17 +19,20 @@
         private readonly ILogger<AppointmentsController> logger;
         private readonly IAppointmentsService appointmentsService;
         private readonly IScheduleService scheduleService;
+        private readonly IEmailService emailService;
         private readonly IMapper mapper;
 
         public AppointmentsController(
             ILogger<AppointmentsController> _logger,
             IAppointmentsService _appointmentsService,
             IScheduleService _scheduleService,
+            IEmailService _emailService,
             IMapper _mapper)
         {
             logger = _logger;
             appointmentsService = _appointmentsService;
             scheduleService = _scheduleService;
+            emailService = _emailService;
             mapper = _mapper;
         }
 
@@ -76,7 +83,7 @@
         } 
 
         [HttpPost("book")]
-        public async Task<IActionResult> Book(AppointmentViewModel model)
+        public async Task<IActionResult> Book(AppointmentViewModel model, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
@@ -84,9 +91,17 @@
             }
 
             var appointmentDto = mapper.Map<AppointmentDto>(model);
-            var id = await appointmentsService.Book(appointmentDto);
+            appointmentDto.PublicToken = TokenHelper.GenerateUrlSafeToken();
+            appointmentDto.CancelToken = TokenHelper.GenerateUrlSafeToken();
+            appointmentDto.AppointmentStatus = AppointmentStatus.Done;
 
-            return Ok(id);
+            // Save appointment to DB
+            appointmentDto.Id = await appointmentsService.Book(appointmentDto, ct);
+
+            // Send confirmation email
+            await emailService.SendAppointmentConfirmationAsync(appointmentDto, ct);
+
+            return Ok(appointmentDto.Id);
         }
 
         [HttpDelete("cancel/{id}")]

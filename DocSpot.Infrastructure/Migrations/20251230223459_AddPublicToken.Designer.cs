@@ -4,6 +4,7 @@ using DocSpot.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocSpot.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251230223459_AddPublicToken")]
+    partial class AddPublicToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,15 +38,6 @@ namespace DocSpot.Infrastructure.Migrations
 
                     b.Property<TimeOnly>("AppointmentTime")
                         .HasColumnType("time");
-
-                    b.Property<DateTime?>("CancelTokenExpireAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CancelTokenHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CancelledAtUtc")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -299,13 +293,13 @@ namespace DocSpot.Infrastructure.Migrations
                         {
                             Id = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f4e440a6-da0c-4842-99b8-056f688a892f",
+                            ConcurrencyStamp = "1a335f76-22cd-42bb-9d42-48292c0763a8",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOpXg6c5UmIlEp7a2jXBZNQj4U2uS37P5juIww2y5U0jB7VgCHuaMI52TTlng9IsFA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN8RBx6Ie0GixWs+pqr35oLDpeZXF0CQgGIYOxJ0kieJRyyX9ikvtCn0ziULZfOVDA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "6a04ce0e-72e0-4319-b73d-741c63bfc5bc",
                             TwoFactorEnabled = false,

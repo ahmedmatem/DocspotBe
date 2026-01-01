@@ -1,4 +1,5 @@
 using AutoMapper;
+using DocSpot.Core.Automapper;
 using DocSpot.Core.Models;
 using DocSpot.Core.Services;
 using DocSpot.Infrastructure.Data;
@@ -14,6 +15,7 @@ namespace DocSpot.Test
         private AppointmentsService appointmentsService;
         private ApplicationDbContext inMemoryDbContext;
         private Repository repository;
+        private IMapper mapper;
 
         [SetUp]
         public void Setup()
@@ -24,11 +26,15 @@ namespace DocSpot.Test
 
             inMemoryDbContext = new ApplicationDbContext(options);
             repository = new Repository(inMemoryDbContext);
-            appointmentsService = new AppointmentsService(repository, null!);
+
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<CoreMappingProfile>());
+            mapper = config.CreateMapper();
+
+            appointmentsService = new AppointmentsService(repository, mapper);
         }
 
         [Test]
-        public void BookTest()
+        public async Task BookTest()
         {
             // Arrange
             var appointment = new AppointmentDto()
@@ -52,8 +58,8 @@ namespace DocSpot.Test
             };
 
             // Act
-            appointmentsService?.Book(appointment);
-            appointmentsService?.Book(appointment1);
+            await appointmentsService.Book(appointment, CancellationToken.None);
+            await appointmentsService.Book(appointment1, CancellationToken.None);
 
             var appList = repository.All<Appointment>().ToList();
             

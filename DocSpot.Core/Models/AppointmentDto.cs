@@ -19,5 +19,11 @@ namespace DocSpot.Core.Models
         public required TimeOnly AppointmentTime { get; set; }
 
         public string? Message { get; set; }
+
+        public AppointmentStatus AppointmentStatus { get; set; }
+
+        public string? PublicToken { get; set; }
+
+        public string? CancelToken { get; set; } = null!;
     }
 }

@@ -10,7 +10,8 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
+    using static DocSpot.Core.Constants;
+    using static DocSpot.Core.Helpers.TimeHelper;
 
     public class AppointmentsService : IAppointmentsService
     {
@@ -79,10 +80,18 @@
         //        .ToListAsync();
         //}
 
-        public async Task<string> Book(AppointmentDto appointmentDto)
+        public async Task<string> Book(AppointmentDto appointmentDto, CancellationToken ct = default)
         {
             var appointment = mapper.Map<Appointment>(appointmentDto);
             appointment.Id = Guid.NewGuid().ToString();
+            appointment.TokenExpireAtUtc = DateTime.UtcNow.AddHours(PublicTokenExpireHours);
+
+            var appointmentStartUtc = GetAppointmentStartUtc(
+                appointment.AppointmentDate,
+                appointment.AppointmentTime);
+            // set cancel token expiry CancelTokenExpireHours before appointment start time
+            appointment.CancelTokenExpireAtUtc = appointmentStartUtc.AddHours(-CancelTokenExpireHours);
+
             await repository.AddAsync(appointment);
             await repository.SaveChangesAsync<Appointment>();
 

@@ -14,15 +14,19 @@ namespace DocSpot.WebAPI.Extensions
     using DocSpot.Infrastructure.Data.Repository;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Services;
+    using DocSpot.Core.Models;
 
     public static class ServiceExtensions
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<IDoctorService, DoctorService>();
             services.AddScoped<IAppointmentsService, AppointmentsService>();
             services.AddScoped<IScheduleService, ScheduleService>();
+
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            services.AddScoped<IEmailService, EmailService>();
 
             return services;
         }
