@@ -124,17 +124,17 @@
                 : Ok(appt);
         }
 
-        //[HttpGet("public/cancel")]
-        //public async Task<IActionResult> Cancel(AppointmentPublicReq req, CancellationToken ct)
-        //{
-        //    var result = await appointmentsService.Cancel(req, ct);
+        [HttpGet("public/cancel")]
+        public async Task<IActionResult> CancelAsync([FromQuery] AppointmentPublicReq req, CancellationToken ct)
+        {
+            var result = await appointmentsService.CancelAsync(req, ct);
 
-        //    return result switch
-        //    {
-        //        //OperationResult.Failed => BadRequest("Invalid appointment ID or token."),
-        //        OperationResult.Success => Ok("Appointment cancelled successfully."),
-        //        _ => BadRequest("Invalid appointment ID or token.")
-        //    };
-        //}
+            return result switch
+            {
+                //OperationResult.Failed => BadRequest("Invalid appointment ID or token."),
+                OperationResult.Success => Ok("Appointment cancelled successfully."),
+                _ => BadRequest("Invalid appointment ID or token.")
+            };
+        }
     }
 }

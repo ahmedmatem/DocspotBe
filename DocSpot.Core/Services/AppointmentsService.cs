@@ -152,7 +152,7 @@
         }
 
         /// <inheritdoc/>
-        public async Task<OperationResult> Cancel(AppointmentPublicReq req, CancellationToken ct)
+        public async Task<OperationResult> CancelAsync(AppointmentPublicReq req, CancellationToken ct)
         {
             var appointment = await repository.All<Appointment>()
                 .FirstOrDefaultAsync(a => a.Id == req.Id, ct);

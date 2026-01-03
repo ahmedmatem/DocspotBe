@@ -24,11 +24,13 @@
         public Task<AppointmentPublicDto?> GetCancelPreviewAsync(AppointmentPublicReq req, CancellationToken ct);
 
         /// <summary>
-        /// Cancels an existing appointment based on the specified request parameters.
+        /// Cancels a pending appointment preview operation asynchronously.
         /// </summary>
-        /// <param name="req">An object containing the details of the appointment to cancel. Cannot be null.</param>
-        /// <returns>A task that represents the asynchronous cancel operation.</returns>
-        public Task<OperationResult> Cancel(AppointmentPublicReq req, CancellationToken ct);
+        /// <param name="req">An object containing the details of the appointment preview to cancel. Cannot be null.</param>
+        /// <param name="ct">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The result contains the outcome of the cancellation
+        /// request.</returns>
+        public Task<OperationResult> CancelAsync(AppointmentPublicReq req, CancellationToken ct);
 
         /// <summary>
         /// Gets all appointments scheduled for the specified date.
