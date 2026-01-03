@@ -23,6 +23,8 @@ namespace DocSpot.Core.Automapper
                 .ReverseMap()
                 .ForMember(d => d.PublicToken, opt => opt.Ignore())
                 .ForMember(d => d.CancelToken, opt => opt.Ignore());
+
+            CreateMap<Appointment, AppointmentPublicDto>();
         }
     }
 }

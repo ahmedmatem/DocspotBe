@@ -4,14 +4,17 @@
     using AutoMapper.QueryableExtensions;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Models;
+    using DocSpot.Core.Models.Req.Appointment;
     using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Repository;
+    using DocSpot.Infrastructure.Data.Types;
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using static DocSpot.Core.Constants;
     using static DocSpot.Core.Helpers.TimeHelper;
+    using static DocSpot.Core.Helpers.TokenHelper;
 
     public class AppointmentsService : IAppointmentsService
     {
@@ -117,10 +120,75 @@
             }
         }
 
-        public async Task Cancel(string appointmentId)
+        /// <inheritdoc/>
+        public async Task<AppointmentPublicDto?> GetCancelPreviewAsync(AppointmentPublicReq req, CancellationToken ct)
         {
-            await repository.DeleteAsync<Appointment>(appointmentId);
-            await repository.SaveChangesAsync<Appointment>();
+            var appointment = await repository.All<Appointment>()
+                .FirstOrDefaultAsync(a => a.Id == req.Id, ct);
+
+            if (appointment is null) return null; // bad link
+
+            var cancelHash = ComputeSha256Hash(req.Token);
+            if (appointment.CancelTokenHash is null ||
+                !cancelHash.Equals(appointment.CancelTokenHash, StringComparison.OrdinalIgnoreCase))
+            {
+                return null; // bad token
+            }
+
+            // 3 hours rule (before appointment start time)
+            var deadlineUtc =
+                GetCancelDeadlineUtc(appointment.AppointmentDate, appointment.AppointmentTime);
+            if (DateTime.UtcNow > deadlineUtc)
+            {
+                return null; // too late to cancel
+            }
+
+            if (appointment.AppointmentStatus == AppointmentStatus.Cancelled)
+            {
+                return null; // already canceled
+            }
+
+            return mapper.Map<AppointmentPublicDto>(appointment);
+        }
+
+        /// <inheritdoc/>
+        public async Task<OperationResult> Cancel(AppointmentPublicReq req, CancellationToken ct)
+        {
+            var appointment = await repository.All<Appointment>()
+                .FirstOrDefaultAsync(a => a.Id == req.Id, ct);
+
+            if (appointment is null) return OperationResult.Failed; // bad link
+
+            var cancelHash = ComputeSha256Hash(req.Token);
+            if(appointment.CancelTokenHash is null ||
+                !cancelHash.Equals(appointment.CancelTokenHash, StringComparison.OrdinalIgnoreCase))
+            {
+                return OperationResult.Failed; // bad token
+            }
+
+            // 3 hours rule (before appointment start time)
+            var deadlineUtc = 
+                GetCancelDeadlineUtc(appointment.AppointmentDate, appointment.AppointmentTime);
+            if(DateTime.UtcNow > deadlineUtc)   
+            {
+                return OperationResult.Failed; // too late to cancel
+            }
+
+            if(appointment.AppointmentStatus == AppointmentStatus.Cancelled)
+            {
+                return OperationResult.Failed; // already canceled
+            }
+
+            appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+            appointment.CancelledAtUtc = DateTime.UtcNow;
+
+            // invalidate the cancel token
+            appointment.CancelTokenHash = null;
+            appointment.CancelTokenExpireAtUtc = null;
+
+            await repository.SaveChangesAsync<Appointment>(ct);
+
+            return OperationResult.Success; // successfully canceled
         }
     }
 }

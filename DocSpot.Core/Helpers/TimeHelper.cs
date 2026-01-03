@@ -1,5 +1,7 @@
 ﻿namespace DocSpot.Core.Helpers
 {
+    using static DocSpot.Core.Constants;
+
     public static class TimeHelper
     {
         // Use IANA on Linux: "Europe/Sofia"
@@ -19,7 +21,7 @@
             return TimeZoneInfo.ConvertTimeToUtc(local, tz);
         }
 
-        public static DateTime GetCancelDeadlineUtc(DateOnly date, TimeOnly time, int hoursBefore = 3)
+        public static DateTime GetCancelDeadlineUtc(DateOnly date, TimeOnly time, int hoursBefore = CancelTokenExpireHours)
             => GetAppointmentStartUtc(date, time).AddHours(-hoursBefore);
     }
 }

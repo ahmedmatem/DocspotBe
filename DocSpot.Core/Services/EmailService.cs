@@ -21,9 +21,9 @@ namespace DocSpot.Core.Services
         {
             var bg = CultureInfo.GetCultureInfo("bg-BG");
 
-            var confirmUrl = $"https://localhost:7168/api/appointments/confirm?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
-            var cancelUrl = $"https://localhost:7168/api/appointments/cancel?token={appointmentDto.CancelToken}&id={appointmentDto.Id}";
-            //var rescheduleUrl = $"https://localhost:7168/api/appointments/reschedule?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
+            var confirmUrl = $"{FrontendBaseUrl}appointment/confirm?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
+            var cancelUrl = $"{FrontendBaseUrl}appointment/public?token={appointmentDto.CancelToken}&id={appointmentDto.Id}";
+            //var rescheduleUrl = $"{FrontendBaseUrl}appointment/reschedule?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
 
             var subject = $"Потвърждение за записан час: {appointmentDto.AppointmentDate.ToString("dd MMMM yyyy")} {appointmentDto.AppointmentTime}";
             appointmentDto.VisitType = appointmentDto.VisitType.ToLower() switch
