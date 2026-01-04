@@ -1,10 +1,8 @@
 ﻿using DocSpot.Core.Contracts;
 using DocSpot.Core.Models;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MimeKit;
+using Resend;
 using System.Globalization;
 using static DocSpot.Core.Constants;
 
@@ -13,11 +11,15 @@ namespace DocSpot.Core.Services
     public class EmailService : IEmailService
     {
         private readonly EmailSettings emailSettings;
+        private readonly IResend resend;
         private ILogger<EmailService> logger;
 
-        public EmailService(IOptions<EmailSettings> options, ILogger<EmailService> _logger)
+        public EmailService(IOptions<EmailSettings> options,
+            IResend _resend,
+            ILogger<EmailService> _logger)
         {
             emailSettings = options.Value;
+            resend = _resend;
             logger = _logger;
         }
 
@@ -126,30 +128,26 @@ namespace DocSpot.Core.Services
                     </tr>
                 </table>";
 
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(emailSettings.FromName, emailSettings.FromEmail));
-            message.To.Add(MailboxAddress.Parse(appointmentDto.PatientEmail));
-            message.Subject = subject;
-
-            var builder = new BodyBuilder { HtmlBody = bodyHtml };
-            message.Body = builder.ToMessageBody();
-
-            using var smtp = new SmtpClient();
+            var from = $"{emailSettings.FromName} <{emailSettings.FromEmail}>";
 
             try
             {
-                // Connect with TLS (STARTTLS on 587 is typical)
-                var socketOpt = emailSettings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.SslOnConnect;
-                await smtp.ConnectAsync(emailSettings.SmtpHost, emailSettings.SmtpPort, socketOpt, ct);
+                var email = new EmailMessage
+                {
+                    From = from,
+                    Subject = subject,
+                    HtmlBody = bodyHtml
+                };
+                email.To.Add(appointmentDto.PatientEmail);
 
-                await smtp.AuthenticateAsync(emailSettings.Username, emailSettings.AppPassword, ct);
-                await smtp.SendAsync(message, ct);
-                await smtp.DisconnectAsync(true, ct);
+                var result = await resend.EmailSendAsync(email, ct);
+
+                // Optional: log message id if available
+                logger.LogInformation("Resend email queued/sent. AppointmentId={AppointmentId}", appointmentDto.Id);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "SMTP send failed");
-                // throw; // or don’t throw if you want booking to succeed even if email fails
+                logger.LogError(ex, "Resend send failed");
             }
         }
     }

@@ -6,6 +6,7 @@ namespace DocSpot.WebAPI
     using DocSpot.WebAPI.Extensions;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.OpenApi.Models;
+    using Resend;
 
     public class Program
     {
@@ -52,6 +53,15 @@ namespace DocSpot.WebAPI
                           .AllowAnyMethod()
                 );
             });
+
+            // Register Resend Email Service
+            builder.Services.AddOptions();
+            builder.Services.AddHttpClient<ResendClient>();
+            builder.Services.Configure<ResendClientOptions>(o =>
+            {
+                o.ApiToken = Environment.GetEnvironmentVariable("RESEND_APITOKEN")!;
+            });
+            builder.Services.AddTransient<IResend, ResendClient>();
 
             var app = builder.Build();
 

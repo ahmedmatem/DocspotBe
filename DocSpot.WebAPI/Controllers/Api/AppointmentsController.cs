@@ -3,14 +3,11 @@
     using AutoMapper;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Exceptions;
-    using DocSpot.Core.Models;
     using DocSpot.Core.Helpers;
-    using DocSpot.Core.Services;
-    using DocSpot.Infrastructure.Data.Models;
+    using DocSpot.Core.Models;
+    using DocSpot.Core.Models.Req.Appointment;
     using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Mvc;
-    using Org.BouncyCastle.Ocsp;
-    using DocSpot.Core.Models.Req.Appointment;
 
     [Route("api/[controller]")]
     [ApiController]
