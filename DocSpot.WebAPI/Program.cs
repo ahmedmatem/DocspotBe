@@ -47,8 +47,7 @@ namespace DocSpot.WebAPI
             var port = Environment.GetEnvironmentVariable("PORT");
             if (!string.IsNullOrEmpty(port))
             {
-                // builder.WebHost.UseUrls($"http://0.0.0.0:{port}")
-                app.Urls.Add($"http://*:{port}");
+                builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
             }
 
             // Configure the HTTP request pipeline.
