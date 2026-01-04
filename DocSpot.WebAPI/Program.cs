@@ -44,6 +44,15 @@ namespace DocSpot.WebAPI
                 });
             }
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Frontend", policy =>
+                    policy.WithOrigins("https://docspot.pages.dev", "http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                );
+            });
+
             var app = builder.Build();
 
             // Run Migration
@@ -60,14 +69,10 @@ namespace DocSpot.WebAPI
                 app.UseSwaggerUI();
             }
 
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins("http://localhost:4200", "https://docspot.pages.dev/")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-            });
-
             app.UseHttpsRedirection();
+
+            app.UseRouting();
+            app.UseCors("Frontend");
 
             app.UseAuthentication();
             app.UseAuthorization();
