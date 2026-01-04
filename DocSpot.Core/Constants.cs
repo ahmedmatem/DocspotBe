@@ -12,7 +12,5 @@
         // Clinic details
         public const string ClinicPhone = "0899 471 713";
         public const string ClinicEmail = "ahmedmatem@gmail.com";
-
-        public const string FrontendBaseUrl = "http://localhost:4200/";
     }
 }

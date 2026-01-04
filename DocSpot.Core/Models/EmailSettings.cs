@@ -9,5 +9,6 @@
         public bool UseStartTls { get; set; } = true;
         public string Username { get; set; } = default!;
         public string AppPassword { get; set; } = default!;
+        public string BaseUrl { get; set; } = default!;
     }
 }
