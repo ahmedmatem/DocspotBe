@@ -13,9 +13,9 @@ namespace DocSpot.Core.Services
     public class EmailService : IEmailService
     {
         private readonly EmailSettings emailSettings;
-        private Logger<EmailService> logger;
+        private ILogger<EmailService> logger;
 
-        public EmailService(IOptions<EmailSettings> options, Logger<EmailService> _logger)
+        public EmailService(IOptions<EmailSettings> options, ILogger<EmailService> _logger)
         {
             emailSettings = options.Value;
             logger = _logger;
