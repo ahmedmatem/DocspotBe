@@ -2,6 +2,7 @@
 using DocSpot.Core.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using System.Globalization;
@@ -12,9 +13,13 @@ namespace DocSpot.Core.Services
     public class EmailService : IEmailService
     {
         private readonly EmailSettings emailSettings;
+        private Logger<EmailService> logger;
 
-        public EmailService(IOptions<EmailSettings> options) 
-            => emailSettings = options.Value;
+        public EmailService(IOptions<EmailSettings> options, Logger<EmailService> _logger)
+        {
+            emailSettings = options.Value;
+            logger = _logger;
+        }
 
         public async Task SendAppointmentConfirmationAsync(AppointmentDto appointmentDto, CancellationToken ct)
         {
@@ -131,13 +136,21 @@ namespace DocSpot.Core.Services
 
             using var smtp = new SmtpClient();
 
-            // Connect with TLS (STARTTLS on 587 is typical)
-            var socketOpt = emailSettings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.SslOnConnect;
-            await smtp.ConnectAsync(emailSettings.SmtpHost, emailSettings.SmtpPort, socketOpt, ct);
+            try
+            {
+                // Connect with TLS (STARTTLS on 587 is typical)
+                var socketOpt = emailSettings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.SslOnConnect;
+                await smtp.ConnectAsync(emailSettings.SmtpHost, emailSettings.SmtpPort, socketOpt, ct);
 
-            await smtp.AuthenticateAsync(emailSettings.Username, emailSettings.AppPassword, ct);
-            await smtp.SendAsync(message, ct);
-            await smtp.DisconnectAsync(true, ct);
+                await smtp.AuthenticateAsync(emailSettings.Username, emailSettings.AppPassword, ct);
+                await smtp.SendAsync(message, ct);
+                await smtp.DisconnectAsync(true, ct);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "SMTP send failed");
+                // throw; // or don’t throw if you want booking to succeed even if email fails
+            }
         }
     }
 }
