@@ -62,8 +62,7 @@ namespace DocSpot.WebAPI
 
             app.UseCors(builder =>
             {
-                //builder.WithOrigins("http://localhost:4200")
-                builder.WithOrigins("https://docspot.pages.dev/")
+                builder.WithOrigins("http://localhost:4200", "https://docspot.pages.dev/")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
             });
