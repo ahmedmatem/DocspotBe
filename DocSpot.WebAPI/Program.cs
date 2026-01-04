@@ -33,6 +33,17 @@ namespace DocSpot.WebAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddApplicationSwaggerGen();
 
+            // Make Kestrel listen on Railway’s PORT
+            // This is needed when deploying to Railway.app - it provides the port via an environment variable
+            var port = Environment.GetEnvironmentVariable("PORT");
+            if (int.TryParse(port, out var p))
+            {
+                builder.WebHost.ConfigureKestrel(options =>
+                {
+                    options.ListenAnyIP(p);
+                });
+            }
+
             var app = builder.Build();
 
             // Run Migration
@@ -40,14 +51,6 @@ namespace DocSpot.WebAPI
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 db.Database.Migrate();
-            }
-
-            // Make Kestrel listen on Railway’s PORT
-            // This is needed when deploying to Railway.app - it provides the port via an environment variable
-            var port = Environment.GetEnvironmentVariable("PORT");
-            if (int.TryParse(port, out var p))
-            {
-                builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(p));
             }
 
             // Configure the HTTP request pipeline.
