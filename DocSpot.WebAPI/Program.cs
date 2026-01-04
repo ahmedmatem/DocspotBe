@@ -45,9 +45,9 @@ namespace DocSpot.WebAPI
             // Make Kestrel listen on Railway’s PORT
             // This is needed when deploying to Railway.app - it provides the port via an environment variable
             var port = Environment.GetEnvironmentVariable("PORT");
-            if (!string.IsNullOrEmpty(port))
+            if (int.TryParse(port, out var p))
             {
-                builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+                builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(p));
             }
 
             // Configure the HTTP request pipeline.
