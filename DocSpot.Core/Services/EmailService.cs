@@ -20,8 +20,8 @@ namespace DocSpot.Core.Services
         {
             var bg = CultureInfo.GetCultureInfo("bg-BG");
 
-            var confirmUrl = $"{emailSettings.BaseUrl}/appointment/confirm?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
-            var cancelUrl = $"{emailSettings.BaseUrl}/appointment/public?token={appointmentDto.CancelToken}&id={appointmentDto.Id}";
+            var confirmUrl = $"https://docspot.pages.dev/appointment/confirm?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
+            var cancelUrl = $"https://docspot.pages.dev/appointment/public?token={appointmentDto.CancelToken}&id={appointmentDto.Id}";
             //var rescheduleUrl = $"{FrontendBaseUrl}appointment/reschedule?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
 
             var subject = $"Потвърждение за записан час: {appointmentDto.AppointmentDate.ToString("dd MMMM yyyy")} {appointmentDto.AppointmentTime}";
