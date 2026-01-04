@@ -65,7 +65,10 @@
             {
                 var slotsForDate = await scheduleService.GetSlotsByDate(date, ct);
                 var appointmentsForDate = await appointmentsService.GetAllByDate(date, ct);
-                var bookedSlots = appointmentsForDate.Select(a => a.AppointmentTime.ToString("HH:mm"));
+                // All appointments in database are booked except those that are cancelled
+                var bookedSlots = appointmentsForDate
+                    .Where(a => a.AppointmentStatus != AppointmentStatus.Cancelled)
+                    .Select(a => a.AppointmentTime.ToString("HH:mm"));
 
                 foreach (var slot in slotsForDate)
                 {

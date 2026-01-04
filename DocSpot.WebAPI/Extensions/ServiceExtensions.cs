@@ -69,7 +69,8 @@ namespace DocSpot.WebAPI.Extensions
             
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(connectionString);
+                //options.UseSqlServer(connectionString);
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             });
 
             services.AddScoped<IRepository, Repository>();
