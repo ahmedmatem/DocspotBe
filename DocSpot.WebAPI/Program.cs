@@ -7,6 +7,7 @@ namespace DocSpot.WebAPI
     using Microsoft.EntityFrameworkCore;
     using Microsoft.OpenApi.Models;
     using Resend;
+    using static DocSpot.Core.Constants;
 
     public class Program
     {
@@ -48,7 +49,7 @@ namespace DocSpot.WebAPI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Frontend", policy =>
-                    policy.WithOrigins("https://docspot.pages.dev", "http://localhost:4200")
+                    policy.WithOrigins(FrontendBaseUrlRemote, FrontendBaseUrlLocal)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                 );

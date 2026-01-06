@@ -12,5 +12,9 @@
         // Clinic details
         public const string ClinicPhone = "0899 471 713";
         public const string ClinicEmail = "ahmedmatem@gmail.com";
+
+        // URLs
+        public const string FrontendBaseUrlLocal = "http://localhost:4200";
+        public const string FrontendBaseUrlRemote = "https://dr-topchu.com";
     }
 }
