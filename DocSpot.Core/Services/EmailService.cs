@@ -27,8 +27,8 @@ namespace DocSpot.Core.Services
         {
             var bg = CultureInfo.GetCultureInfo("bg-BG");
 
-            var confirmUrl = $"https://docspot.pages.dev/appointment/confirm?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
-            var cancelUrl = $"https://docspot.pages.dev/appointment/public?token={appointmentDto.CancelToken}&id={appointmentDto.Id}";
+            var confirmUrl = $"{FrontendBaseUrlRemote}/appointment/confirm?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
+            var cancelUrl = $"{FrontendBaseUrlRemote}/appointment/public?token={appointmentDto.CancelToken}&id={appointmentDto.Id}";
             //var rescheduleUrl = $"{FrontendBaseUrl}appointment/reschedule?token={appointmentDto.PublicToken}&id={appointmentDto.Id}";
 
             var subject = $"Потвърждение за записан час: {appointmentDto.AppointmentDate.ToString("dd MMMM yyyy")} {appointmentDto.AppointmentTime}";
@@ -114,9 +114,9 @@ namespace DocSpot.Core.Services
             
                                 <p style=""text-align:center;font-size:13px;color:#6f7072;margin-top:40px"">
                                   С уважение, <br>
-                                  <strong>Д-р Мария Илиева</strong><br>
-                                  © 2025 <a href=""https://docspot.com"" style=""color:#6f7072;text-decoration:none"" target=""_blank"">
-                                    https://docspot.com
+                                  <strong>{DoctorName}</strong><br>
+                                  © {DateTime.Now.Year} <a href=""{FrontendBaseUrlRemote}"" style=""color:#6f7072;text-decoration:none"" target=""_blank"">
+                                    {FrontendBaseUrlRemote}
                                   </a>
                                 </p>
 

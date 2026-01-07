@@ -2,6 +2,8 @@
 {
     public sealed class Constants
     {
+        public const string DoctorName = "Д-р Кадрие Топчу";
+
         public const string DateTimeFormat = "yyyy-MM-dd";
 
         public const int TimeSlotMaxLengthMinutes = 60;
