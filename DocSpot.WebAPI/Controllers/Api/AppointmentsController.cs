@@ -8,6 +8,7 @@
     using DocSpot.Core.Models.Req.Appointment;
     using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Mvc;
+    using System.Globalization;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -60,8 +61,8 @@
         {
             try
             {
-                var slotsForDate = await scheduleService.GetSlotsByDate(date, ct);
-                var appointmentsForDate = await appointmentsService.GetAllByDate(date, ct);
+                var slotsForDate = await scheduleService.GetSlotsByDateAsync(date, ct);
+                var appointmentsForDate = await appointmentsService.GetAllByDateAsync(date, ct);
                 // All appointments in database are booked except those that are cancelled
                 var bookedSlots = appointmentsForDate
                     .Where(a => a.AppointmentStatus != AppointmentStatus.Cancelled)
@@ -69,7 +70,9 @@
 
                 foreach (var slot in slotsForDate)
                 {
-                    if (bookedSlots.Contains(slot.Time))
+
+                    if ((IsToday(date) && IsSlotTimePassed(slot.Time)) ||
+                        bookedSlots.Contains(slot.Time))
                     {
                         slot.Available = false;
                     }
@@ -135,6 +138,44 @@
                 OperationResult.Success => Ok("Appointment cancelled successfully."),
                 _ => BadRequest("Invalid appointment ID or token.")
             };
+        }
+
+        private static bool TryParseDateOnly(string dateStr, out DateOnly dateOnly)
+        {
+            return DateOnly.TryParseExact(
+                dateStr,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out dateOnly);
+        }
+
+        private static bool IsToday(string dateStr)
+        {
+            if (!TryParseDateOnly(dateStr, out DateOnly dateOnly))
+            {
+                throw new ScheduleValidationException($"Date: {dateStr} - Invalid date format. Expected yyyy-MM-dd.");
+            }
+            return dateOnly == DateOnly.FromDateTime(DateTime.Today);
+        }
+
+        private static bool TryParseTimeOnly(string timeStr, out TimeOnly timeOnly)
+        {
+            return TimeOnly.TryParseExact(
+                timeStr,
+                "HH:mm",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out timeOnly);
+        }
+
+        private static bool IsSlotTimePassed(string slotTimeStr)
+        {
+            if (!TryParseTimeOnly(slotTimeStr, out var slot))
+                return false;
+
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            return slot <= now;
         }
     }
 }

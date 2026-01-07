@@ -102,7 +102,7 @@
         }
 
         /// <inheritdoc/>
-        public async Task<IReadOnlyList<AppointmentDto>> GetAllByDate(string dateStr, CancellationToken ct)
+        public async Task<IReadOnlyList<AppointmentDto>> GetAllByDateAsync(string dateStr, CancellationToken ct)
         {
             try
             {

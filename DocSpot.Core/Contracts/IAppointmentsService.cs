@@ -48,6 +48,6 @@
         /// <exception cref="FormatException">
         /// Thrown if <paramref name="date"/> is not in the expected <c>yyyy-MM-dd</c> format.
         /// </exception>
-        public Task<IReadOnlyList<AppointmentDto>> GetAllByDate(string dateStr, CancellationToken ct);
+        public Task<IReadOnlyList<AppointmentDto>> GetAllByDateAsync(string dateStr, CancellationToken ct);
     }
 }

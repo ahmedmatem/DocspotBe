@@ -133,9 +133,9 @@ namespace DocSpot.Core.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IReadOnlyList<SlotDto>> GetSlotsByDate(string date, CancellationToken ct)
+        public async Task<IReadOnlyList<SlotDto>> GetSlotsByDateAsync(string date, CancellationToken ct)
         {
-            if(!TryParseDayOnly(date, out DateOnly dateOnly))
+            if(!TryParseDateOnly(date, out DateOnly dateOnly))
             {
                 throw new ScheduleValidationException($"Date: {date} - Invalid date format. Expected yyyy-MM-dd.");
             }
@@ -296,7 +296,7 @@ namespace DocSpot.Core.Services
             return $"{startStr}-{endStr}";
         }
 
-        private static bool TryParseDayOnly(string dateStr, out DateOnly dateOnly)
+        private static bool TryParseDateOnly(string dateStr, out DateOnly dateOnly)
         {
             return DateOnly.TryParseExact(
                 dateStr, 

@@ -36,6 +36,6 @@ namespace DocSpot.Core.Contracts
         /// or when no active week schedule exists for the given date.
         /// </exception>
 
-        public Task<IReadOnlyList<SlotDto>> GetSlotsByDate(string date, CancellationToken ct);
+        public Task<IReadOnlyList<SlotDto>> GetSlotsByDateAsync(string date, CancellationToken ct);
     }
 }
