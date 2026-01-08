@@ -49,7 +49,7 @@ namespace DocSpot.WebAPI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Frontend", policy =>
-                    policy.WithOrigins(FrontendBaseUrlRemote, FrontendBaseUrlLocal)
+                    policy.WithOrigins(FrontendBaseUrlRemote, FrontendBaseUrlRemoteWWW, FrontendBaseUrlLocal)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                 );

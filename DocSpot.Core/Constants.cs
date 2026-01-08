@@ -18,5 +18,6 @@
         // URLs
         public const string FrontendBaseUrlLocal = "http://localhost:4200";
         public const string FrontendBaseUrlRemote = "https://dr-topchu.com";
+        public const string FrontendBaseUrlRemoteWWW = "https://www.dr-topchu.com";
     }
 }
