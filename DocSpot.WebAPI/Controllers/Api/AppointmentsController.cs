@@ -3,6 +3,7 @@
     using AutoMapper;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Exceptions;
+    using DocSpot.Core.Extensions;
     using DocSpot.Core.Helpers;
     using DocSpot.Core.Models;
     using DocSpot.Core.Models.Req.Appointment;
@@ -71,7 +72,7 @@
                 foreach (var slot in slotsForDate)
                 {
 
-                    if ((IsToday(date) && IsSlotTimePassed(slot.Time)) ||
+                    if ((date.IsToday() && slot.Time.IsTimePassed()) ||
                         bookedSlots.Contains(slot.Time))
                     {
                         slot.Available = false;
@@ -138,59 +139,6 @@
                 OperationResult.Success => Ok("Appointment cancelled successfully."),
                 _ => BadRequest("Invalid appointment ID or token.")
             };
-        }
-
-        private static bool TryParseDateOnly(string dateStr, out DateOnly dateOnly)
-        {
-            return DateOnly.TryParseExact(
-                dateStr,
-                "yyyy-MM-dd",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out dateOnly);
-        }
-
-        private static bool IsToday(string dateStr)
-        {
-            if (!TryParseDateOnly(dateStr, out DateOnly dateOnly))
-            {
-                throw new ScheduleValidationException($"Date: {dateStr} - Invalid date format. Expected yyyy-MM-dd.");
-            }
-            return dateOnly == DateOnly.FromDateTime(DateTime.Today);
-        }
-
-        private static bool TryParseTimeOnly(string timeStr, out TimeOnly timeOnly)
-        {
-            return TimeOnly.TryParseExact(
-                timeStr,
-                "HH:mm",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out timeOnly);
-        }
-
-        private static bool IsSlotTimePassed(string slotTimeStr)
-        {
-            if (!TryParseTimeOnly(slotTimeStr, out var slot))
-                return false;
-
-            var bgTz = GetBgTimeZone();
-
-            // Start from UTC, then convert to BG
-            var nowBg = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, bgTz);
-            var nowBgTime = TimeOnly.FromDateTime(nowBg.DateTime);
-
-            return slot <= nowBgTime;
-        }
-
-        private static TimeZoneInfo GetBgTimeZone()
-        {
-            // Linux containers usually use IANA ids
-            try { return TimeZoneInfo.FindSystemTimeZoneById("Europe/Sofia"); }
-            catch (TimeZoneNotFoundException) { }
-
-            // Windows uses Windows ids
-            return TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time");
         }
     }
 }
