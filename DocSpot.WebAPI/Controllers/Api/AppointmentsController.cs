@@ -174,8 +174,23 @@
             if (!TryParseTimeOnly(slotTimeStr, out var slot))
                 return false;
 
-            var now = TimeOnly.FromDateTime(DateTime.Now);
-            return slot <= now;
+            var bgTz = GetBgTimeZone();
+
+            // Start from UTC, then convert to BG
+            var nowBg = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, bgTz);
+            var nowBgTime = TimeOnly.FromDateTime(nowBg.DateTime);
+
+            return slot <= nowBgTime;
+        }
+
+        private static TimeZoneInfo GetBgTimeZone()
+        {
+            // Linux containers usually use IANA ids
+            try { return TimeZoneInfo.FindSystemTimeZoneById("Europe/Sofia"); }
+            catch (TimeZoneNotFoundException) { }
+
+            // Windows uses Windows ids
+            return TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time");
         }
     }
 }
