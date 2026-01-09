@@ -38,6 +38,7 @@ namespace DocSpot.Infrastructure.Data
             //builder.ApplyConfiguration(new PatientEntityConfiguration());
             builder.ApplyConfiguration(new WeekScheduleCfg());
             builder.ApplyConfiguration(new WeekScheduleIntervalCfg());
+            builder.ApplyConfiguration(new HolidayEntityConfiguration());   
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -51,5 +52,7 @@ namespace DocSpot.Infrastructure.Data
         public DbSet<WeekScheduleInterval> WeekScheduleIntervals { get; set; }
 
         public DbSet<Appointment> Appointments { get; set; }
+
+        public DbSet<Holiday> Holidays { get; set; }
     }
 }
