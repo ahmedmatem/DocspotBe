@@ -1,10 +1,13 @@
 namespace DocSpot.WebAPI
 {
     using DocSpot.Core.Automapper;
+    using DocSpot.Core.Contracts;
     using DocSpot.Infrastructure.Data;
+    using DocSpot.Infrastructure.Data.Models;
     using DocSpot.WebAPI.Automapper;
     using DocSpot.WebAPI.Extensions;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
     using Resend;
     using static DocSpot.Core.Constants;
@@ -90,6 +93,15 @@ namespace DocSpot.WebAPI
 
 
             app.MapControllers();
+
+            // manually run: POST /api/admin/holidays/sync/2026 to sync holidays for year 2026
+            app.MapPost("/api/admin/holidays/sync/{year:int}", 
+                async (int year, IHolidaysService sync, CancellationToken ct) =>
+                {
+                    var changes = await sync.SyncYearAsync("BG", year, ct);
+                    return Results.Ok(new { year, country = "BG", changes });
+                }
+            );
 
             app.Run();
         }
