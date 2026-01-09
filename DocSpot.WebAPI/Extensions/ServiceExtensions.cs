@@ -28,6 +28,12 @@ namespace DocSpot.WebAPI.Extensions
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped<IEmailService, EmailService>();
 
+            services.AddHttpClient<INagerHolidaysClient, NagerHolidaysClient>(c =>
+            {
+                c.BaseAddress = new Uri("https://date.nager.at/");
+                c.Timeout = TimeSpan.FromSeconds(10);
+            });
+
             return services;
         }
 
