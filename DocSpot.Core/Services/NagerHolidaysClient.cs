@@ -1,5 +1,5 @@
 ﻿using DocSpot.Core.Contracts;
-using DocSpot.Core.Models;
+using DocSpot.Core.Models.NagePublicHolidays;
 using System.Net.Http.Json;
 
 namespace DocSpot.Core.Services

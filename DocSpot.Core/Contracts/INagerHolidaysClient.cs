@@ -1,4 +1,4 @@
-﻿using DocSpot.Core.Models;
+﻿using DocSpot.Core.Models.NagePublicHolidays;
 using System.Collections.Generic;
 
 namespace DocSpot.Core.Contracts
