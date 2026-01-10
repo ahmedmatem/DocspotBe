@@ -38,7 +38,7 @@ namespace DocSpot.WebAPI.Controllers.Api
             return Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
         }
 
-        [HttpGet("upcomming")]
+        [HttpGet("upcoming")]
         public async Task<ActionResult<IEnumerable<string>>> GetUpcoming(CancellationToken ct)
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
