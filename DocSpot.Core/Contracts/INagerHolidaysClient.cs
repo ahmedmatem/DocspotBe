@@ -1,5 +1,4 @@
 ﻿using DocSpot.Core.Models.NagePublicHolidays;
-using System.Collections.Generic;
 
 namespace DocSpot.Core.Contracts
 {
@@ -8,6 +7,11 @@ namespace DocSpot.Core.Contracts
         Task<IReadOnlyList<NagerHolidayDto>> GetPublicHolidaysAsync(
             string countryCode, 
             int year, 
+            CancellationToken ct);
+
+        Task<IReadOnlyCollection<DateOnly>> GetLongWeekendDatesAsync(
+            string countryCode,
+            int year,
             CancellationToken ct);
     }
 }
