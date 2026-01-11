@@ -26,9 +26,10 @@ namespace DocSpot.Core.Services
         public async Task<int> SyncYearAsync(string countryCode, int year, CancellationToken ct)
         {
             var holidays = await http.GetPublicHolidaysAsync(countryCode, year, ct);
+            var longWeekends = await http.GetLongWeekendDatesAsync(countryCode, year, ct);
 
-            // Map to entities
             var mapped = new List<Holiday>(holidays.Count);
+            // Map holidays to entities
             foreach (var holiday in holidays)
             {
                 if (!DateOnly.TryParseExact(
@@ -48,6 +49,22 @@ namespace DocSpot.Core.Services
                     Type = holiday.types is { Length: > 0 } ? string.Join(",", holiday.types) : null
                 });
             }
+
+            // Map longWeekends to entities
+            foreach (var date in longWeekends)
+            {
+                if (mapped.Any(h => h.Date == date)) { continue; }
+
+                mapped.Add(new Holiday
+                {
+                    CountryCode = countryCode,
+                    Date = date,
+                    LocalName = "",
+                    Name = "",
+                    IsGlobal = false,
+                });
+            }
+
 
             // Upsert (simple + reliable)
             // Load existing for that year & country in one query

@@ -1,5 +1,5 @@
 ﻿using DocSpot.Core.Contracts;
-using DocSpot.Core.Models.NagePublicHolidays;
+using DocSpot.Core.Models;
 using System.Net.Http.Json;
 using static System.Net.WebRequestMethods;
 
@@ -10,12 +10,12 @@ namespace DocSpot.Core.Services
         private readonly HttpClient httpClient;
         public NagerHolidaysClient(HttpClient _httpClient) => httpClient = _httpClient;
 
-        public async Task<IReadOnlyList<NagerHolidayDto>> GetPublicHolidaysAsync(string countryCode, int year, CancellationToken ct)
+        public async Task<IReadOnlyList<NagerHolidays>> GetPublicHolidaysAsync(string countryCode, int year, CancellationToken ct)
         {
             // BaseAddress should be: https://date.nager.at/
             var url = $"api/v3/PublicHolidays/{year}/{countryCode}";
-            return await httpClient.GetFromJsonAsync<NagerHolidayDto[]>(url, ct) 
-                ?? Array.Empty<NagerHolidayDto>();
+            return await httpClient.GetFromJsonAsync<NagerHolidays[]>(url, ct) 
+                ?? Array.Empty<NagerHolidays>();
         }
         public async Task<IReadOnlyCollection<DateOnly>> GetLongWeekendDatesAsync(string countryCode, int year, CancellationToken ct)
         {

@@ -1,10 +1,10 @@
-﻿using DocSpot.Core.Models.NagePublicHolidays;
+﻿using DocSpot.Core.Models;
 
 namespace DocSpot.Core.Contracts
 {
     public interface INagerHolidaysClient
     {
-        Task<IReadOnlyList<NagerHolidayDto>> GetPublicHolidaysAsync(
+        Task<IReadOnlyList<NagerHolidays>> GetPublicHolidaysAsync(
             string countryCode, 
             int year, 
             CancellationToken ct);

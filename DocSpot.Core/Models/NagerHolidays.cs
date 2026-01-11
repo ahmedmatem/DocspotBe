@@ -1,6 +1,6 @@
-﻿namespace DocSpot.Core.Models.NagePublicHolidays
+﻿namespace DocSpot.Core.Models
 {
-    public sealed record NagerHolidayDto
+    public sealed record NagerHolidays
     (
         string date,
         string localName,
