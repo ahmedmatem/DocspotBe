@@ -36,6 +36,7 @@ namespace DocSpot.Infrastructure.Data
             //// entity configurations
             //builder.ApplyConfiguration(new DoctorEntityConfiguration());
             //builder.ApplyConfiguration(new PatientEntityConfiguration());
+            builder.ApplyConfiguration(new AppointmentConfiguration());
             builder.ApplyConfiguration(new WeekScheduleCfg());
             builder.ApplyConfiguration(new WeekScheduleIntervalCfg());
             builder.ApplyConfiguration(new HolidayEntityConfiguration());   
