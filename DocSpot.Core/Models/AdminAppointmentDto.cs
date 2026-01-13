@@ -9,7 +9,7 @@ namespace DocSpot.Core.Models
         string PatientPhone,
         string PatientEmail,
         string VisitType,
-        string AppointmentDate,   // yyyy-MM-dd
+        DateOnly AppointmentDate,   // yyyy-MM-dd
         string AppointmentTime,   // HH:mm
         string? Message,
         AppointmentStatus AppointmentStatus,
