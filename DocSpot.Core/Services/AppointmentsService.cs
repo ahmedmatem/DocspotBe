@@ -207,16 +207,13 @@
                 query = query.Where(a => a.AppointmentDate >= fromDate);
             if (toDate is not null)
                 query = query.Where(a => a.AppointmentDate <= toDate);
-            if (req.Status is not null)
+            if (req.Status is not null && req.Status == "CANCELLED")
             {
-                if(req.Status == "CANCELLED")
-                {
-                    query = query.Where(x => x.AppointmentStatus == AppointmentStatus.Cancelled);
-                }
-                else
-                {
-                    query = query.Where(x => x.AppointmentStatus != AppointmentStatus.Cancelled);
-                }
+                query = query.Where(x => x.AppointmentStatus == AppointmentStatus.Cancelled);
+            }
+            else
+            {
+                query = query.Where(x => x.AppointmentStatus != AppointmentStatus.Cancelled);
             }
             if (!string.IsNullOrWhiteSpace(req.Query))
             {
