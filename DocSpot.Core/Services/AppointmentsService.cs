@@ -3,6 +3,7 @@
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using DocSpot.Core.Contracts;
+    using DocSpot.Core.Extensions;
     using DocSpot.Core.Models;
     using DocSpot.Core.Models.Req.Appointment;
     using DocSpot.Infrastructure.Data.Models;
@@ -12,6 +13,8 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
+    using System.Net.NetworkInformation;
     using static DocSpot.Core.Constants;
     using static DocSpot.Core.Helpers.TimeHelper;
     using static DocSpot.Core.Helpers.TokenHelper;
@@ -189,6 +192,46 @@
             await repository.SaveChangesAsync<Appointment>(ct);
 
             return OperationResult.Success; // successfully canceled
+        }
+
+        public async Task<IReadOnlyCollection<AdminAppointmentDto>> GetList(
+            AdminAppointmentsReq req, CancellationToken ct)
+        {
+            DateOnly? fromDate = req.From.ToDateOnlyOrNull();
+            DateOnly? toDate = req.To.ToDateOnlyOrNull();
+
+            var query = repository.AllReadOnly<Appointment>()
+                .AsQueryable();
+
+            if (fromDate is not null)
+                query = query.Where(a => a.AppointmentDate >= fromDate);
+            if (toDate is not null)
+                query = query.Where(a => a.AppointmentDate <= toDate);
+            if (req.Status is not null)
+            {
+                if(req.Status == "CANCELLED")
+                {
+                    query = query.Where(x => x.AppointmentStatus == AppointmentStatus.Cancelled);
+                }
+                else
+                {
+                    query = query.Where(x => x.AppointmentStatus != AppointmentStatus.Cancelled);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(req.Query))
+            {
+                req.Query = req.Query.Trim();
+                query = query.Where(x =>
+                    x.PatientName.Contains(req.Query) ||
+                    x.PatientPhone.Contains(req.Query) ||
+                    x.PatientEmail.Contains(req.Query));
+            }
+
+            return await query
+                .OrderBy(x => x.AppointmentDate)
+                .ThenBy(x => x.AppointmentTime)
+                .ProjectTo<AdminAppointmentDto>(mapper.ConfigurationProvider)
+                .ToListAsync(ct);
         }
     }
 }

@@ -9,6 +9,8 @@ namespace DocSpot.Core.Automapper
     {
         public CoreMappingProfile()
         {
+            CreateMap<Appointment, AdminAppointmentDto>();
+
             CreateMap<AppointmentDto, Appointment>()
                 .ForMember(d => d.PublicTokenHash, opt => opt.MapFrom(s =>
                     string.IsNullOrEmpty(s.PublicToken) 
