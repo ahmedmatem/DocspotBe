@@ -37,5 +37,7 @@ namespace DocSpot.Core.Contracts
         /// </exception>
 
         public Task<IReadOnlyList<SlotDto>> GetSlotsByDateAsync(string date, CancellationToken ct);
+
+        public Task<bool> DeleteWeekScheduleAsync(DateOnly startDate, CancellationToken ct);
     }
 }

@@ -14,7 +14,6 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Net.NetworkInformation;
     using static DocSpot.Core.Constants;
     using static DocSpot.Core.Helpers.TimeHelper;
     using static DocSpot.Core.Helpers.TokenHelper;
@@ -104,7 +103,22 @@
             return appointment.Id;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets all appointments scheduled for the specified date.
+        /// </summary>
+        /// <param name="dateStr">
+        /// The date for which to retrieve appointments, in <c>yyyy-MM-dd</c> format.
+        /// </param>
+        /// <param name="ct">
+        /// A cancellation token that can be used to cancel the asynchronous operation.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a read-only list of
+        /// <see cref="AppointmentDto"/> instances scheduled on the specified date.
+        /// </returns>
+        /// <exception cref="FormatException">
+        /// Thrown if <paramref name="date"/> is not in the expected <c>yyyy-MM-dd</c> format.
+        /// </exception>
         public async Task<IReadOnlyList<AppointmentDto>> GetAllByDateAsync(string dateStr, CancellationToken ct)
         {
             try

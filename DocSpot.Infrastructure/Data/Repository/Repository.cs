@@ -4,7 +4,7 @@
     using System.Threading;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
-
+    using Microsoft.EntityFrameworkCore.Query;
 
     public class Repository : IRepository
     {
@@ -81,6 +81,16 @@
         public void UpdateRange<T>(IEnumerable<T> entities) where T : class
         {
             this.DbSet<T>().UpdateRange(entities);
+        }
+
+        public async Task<int> ExecuteDeleteAsync<T>(CancellationToken ct) where T : class
+        {
+            return await DbSet<T>().ExecuteDeleteAsync(ct);
+        }
+
+        public async Task<int> ExecuteUpdateAsync<T>(Expression<Func<SetPropertyCalls<T>,SetPropertyCalls<T>>> exp, CancellationToken ct = default) where T : class
+        {
+            return await DbSet<T>().ExecuteUpdateAsync(exp, ct);
         }
 
         /// <summary>

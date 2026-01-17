@@ -5,6 +5,7 @@ using DocSpot.Infrastructure.Data.Models;
 using DocSpot.Infrastructure.Data.Repository;
 using DocSpot.Infrastructure.Data.Types;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 using static DocSpot.Core.Constants;
 
@@ -13,21 +14,25 @@ namespace DocSpot.Core.Services
     public class ScheduleService : IScheduleService
     {
         private readonly IRepository repository;
+        private readonly ILogger<ScheduleService> logger;
 
-        public ScheduleService(IRepository _repository)
+        public ScheduleService(
+            IRepository _repository,
+            ILogger<ScheduleService> _logger)
         {
             repository = _repository;
+            logger = _logger;
         }
 
         public async Task<string> CreateWeekScheduleAsync(WeekScheduleDto dto, CancellationToken ct = default)
         {
             if (!DateOnly.TryParse(dto.StartDate, out var startDate))
             {
-                throw new ScheduleValidationException("Invalid startDate. Expected yyyy-mm-dd.");
+                throw new ScheduleValidationException($"Invalid startDate {dto.StartDate}. Expected yyyy-mm-dd.");
             }
 
-            var exists = await repository
-                .AnyAsync<WeekSchedule>(ws => ws.StartDate == startDate, ct);
+            // There would be only one schedule for a date
+            var exists = await repository.AnyAsync<WeekSchedule>(ws => ws.StartDate == startDate, ct);
             if (exists)
             {
                 throw new ScheduleValidationException(
@@ -42,7 +47,7 @@ namespace DocSpot.Core.Services
             var intervals = new List<WeekScheduleInterval>();
             foreach (var (dayKey, ranges) in dto.WeekSchedule)
             {
-                if (!TryParseDay(dayKey, out var day))
+                if (!TryParseDay(dayKey.ToLowerInvariant(), out var day))
                 {
                     throw new ScheduleValidationException($"Invalid day key: '{dayKey}'. Expected mon|tue|wed|thu|fri|sat|sun.");
                 }
@@ -68,21 +73,21 @@ namespace DocSpot.Core.Services
                 }
 
                 // check overlaps per day
-                var dayIntervals = intervals.Where(x => x.Day == day)
-                                            .OrderBy(x => x.Start).ToList();
+                var dayIntervals = intervals.Where(x => x.Day == day).OrderBy(x => x.Start).ToList();
                 for (int i = 0; i < dayIntervals.Count - 1; i++)
+                {
                     if (dayIntervals[i].End > dayIntervals[i + 1].Start)
+                    {
                         throw new ScheduleValidationException($"Overlapping intervals on {dayKey}.");
+                    }
+                }
             }
 
             var entity = new WeekSchedule()
             {
                 StartDate = startDate,
                 SlotLengthMinutes = dto.SlotLength,
-                Intervals = intervals
-                    .OrderBy(x => x.Day)
-                    .ThenBy(x => x.Start)
-                    .ToList()
+                Intervals = intervals.OrderBy(x => x.Day).ThenBy(x => x.Start).ToList()
             };
 
             await repository.AddAsync(entity);
@@ -113,9 +118,7 @@ namespace DocSpot.Core.Services
                     ["sat"] = new(),
                     ["sun"] = new(),
                 };
-                foreach (var interval in weekSchedule.Intervals
-                                                        .OrderBy(x => x.Day)
-                                                        .ThenBy(x => x.Start))
+                foreach (var interval in weekSchedule.Intervals.OrderBy(x => x.Day).ThenBy(x => x.Start))
                 {
                     var dayKey = ToDayKey(interval.Day); // 1 -> mon, 2 -> tue, ...
                     weekDict[dayKey].Add(ToRangeString(interval.Start, interval.End));
@@ -191,6 +194,15 @@ namespace DocSpot.Core.Services
             return result;
         }
 
+        public async Task<bool> DeleteWeekScheduleAsync(DateOnly startDate, CancellationToken ct = default)
+        {
+            var affected = await repository.All<WeekSchedule>()
+                .Where(ws => ws.StartDate == startDate)
+                .ExecuteDeleteAsync(ct);
+
+            return affected > 0;
+        }
+
         #region HELPERS
 
         /// <summary>
@@ -226,8 +238,7 @@ namespace DocSpot.Core.Services
 
             var parts = s.Split('-', 2, StringSplitOptions.TrimEntries);
             if (parts.Length != 2) return false;
-            return TimeSpan.TryParse(parts[0], out start) &&
-                   TimeSpan.TryParse(parts[1], out end);
+            return TimeSpan.TryParse(parts[0], out start) && TimeSpan.TryParse(parts[1], out end);
         }
 
         private static bool TryParseDay(string key, out DayOfWeekIso day)

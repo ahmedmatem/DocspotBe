@@ -76,7 +76,7 @@ namespace DocSpot.Core.Extensions
         }
 
         // ---------- Business checks (slot passed) ----------
-
+        
         /// <summary>
         /// Checks if slot time (HH:mm) has passed "today" in the given timezone.
         /// Note: this ignores date; use IsSlotPassed(date, timeStr, tz) if you have the date.

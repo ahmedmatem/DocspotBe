@@ -10,6 +10,7 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using DocSpot.Core.Extensions;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -34,12 +35,13 @@
 
         // GET api/admin/all-week-schedule
         [HttpGet("all-week-schedule")]
-        public async Task<IActionResult> GetAll(CancellationToken ct)
+        public async Task<IActionResult> GetAllWeekSchedulesWithIntervals(CancellationToken ct)
         {
             var list = await scheduleService.GetAllWeekSchedulesWithIntervalsAsync(ct);
             return Ok(list);
         }
 
+        // POST /api/admin/week-schedule
         [HttpPost("week-schedule")]
         public async Task<IActionResult> CreateWeekSchedule(WeekScheduleDto dto, CancellationToken ct)
         {
@@ -53,6 +55,18 @@
             {
                 return BadRequest(new { error = ex.Message });
             }
+        }
+
+        // DELETE /api/admin/week-schedule/{startDate}
+        [HttpDelete("week-schedule/{startDate}")]
+        public async Task<ActionResult<int>> Delete([FromRoute] string startDate, CancellationToken ct = default)
+        {
+            if(!startDate.TryParseDateOnlyExact(out var date))
+                return BadRequest($"Invalid date: {startDate}. Use yyyy-MM-dd.");
+
+            var ok = await scheduleService.DeleteWeekScheduleAsync(date, ct);
+            if (!ok) return NotFound();   // 404 if missing
+            return NoContent();           // 204 on success
         }
 
         [HttpPost("register-doctor")]

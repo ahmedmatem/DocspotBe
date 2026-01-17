@@ -1,5 +1,6 @@
 ﻿namespace DocSpot.Infrastructure.Data.Repository
 {
+    using Microsoft.EntityFrameworkCore.Query;
     using System.Linq.Expressions;
 
     public interface IRepository
@@ -46,6 +47,12 @@
         /// </summary>
         /// <param name="entities">Enumerable collection of entities to be updated</param>
         void UpdateRange<T>(IEnumerable<T> entities) where T : class;
+
+        Task<int> ExecuteUpdateAsync<T>(
+            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> exp, 
+            CancellationToken ct = default) where T : class;
+
+        Task<int> ExecuteDeleteAsync<T>(CancellationToken ct) where T: class;
 
         /// <summary>
         /// Deletes a record from database
