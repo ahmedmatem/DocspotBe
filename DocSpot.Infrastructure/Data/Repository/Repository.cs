@@ -145,6 +145,16 @@
         }
 
         /// <summary>
+        /// Attaches given entity to the context
+        /// </summary>
+        /// <param name="entity">Entity to be attached</param>
+        public void Attach<T>(T entity) where T : class
+        {
+            // Equivalent to: context.Entry(entity).State = EntityState.Unchanged;
+            context.Set<T>().Attach(entity);
+        }
+
+        /// <summary>
         /// Disposing the context when it is not neede
         /// Don't have to call this method explicitely
         /// Leave it to the IoC container

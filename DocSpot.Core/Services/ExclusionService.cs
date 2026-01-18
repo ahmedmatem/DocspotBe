@@ -76,7 +76,7 @@ namespace DocSpot.Core.Services
             {
                 return await repository.SaveChangesAsync<ScheduleExclusion>();
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 // de-duplicate by (Date, ExclusionType, Start, End); simplistic retry:
                 // Fallback: insert one by one (ignore duplicates)
@@ -98,9 +98,20 @@ namespace DocSpot.Core.Services
             }
         }
 
-        public Task<bool> DeleteAsync(string id, CancellationToken ct = default)
+        public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var stub = new ScheduleExclusion { Id = id };
+            repository.Attach(stub);
+            repository.Delete(stub);
+            try
+            {
+                var affected = await repository.SaveChangesAsync<ScheduleExclusion>(ct);
+                return affected > 0;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
         }
 
         public Task<List<ScheduleExclusion>> GetAsync(DateOnly? from, DateOnly? to, CancellationToken ct = default)
@@ -115,9 +126,23 @@ namespace DocSpot.Core.Services
 
         }
 
+        // Overlap helper: [slotStart, slotEnd) intersects Day or TimeRange
         public bool IsSlotExcluded(DateOnly date, TimeSpan start, TimeSpan end, IReadOnlyList<ScheduleExclusion> exclusions)
         {
-            throw new NotImplementedException();
+            foreach (var ex in exclusions)
+            {
+                if (ex.Date != date) continue;
+
+                if (ex.ExclusionType == ExclusionType.Day) return true;
+
+                if (ex.ExclusionType == ExclusionType.TimeRange && ex.Start.HasValue && ex.End.HasValue)
+                {
+                    // Overlap if start < ex.End && ex.Start < end
+                    if (start < ex.End.Value && ex.Start.Value < end)
+                        return true;
+                }
+            }
+            return false;
         }
     }
 }

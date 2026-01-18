@@ -85,6 +85,12 @@
         void Detach<T>(T entity) where T : class;
 
         /// <summary>
+        /// Attaches given entity to the context
+        /// </summary>
+        /// <param name="entity">Entity to be attached</param>
+        void Attach<T>(T entity) where T : class;
+
+        /// <summary>
         /// Saves all made changes in trasaction
         /// </summary>
         /// <returns>Error code</returns>
