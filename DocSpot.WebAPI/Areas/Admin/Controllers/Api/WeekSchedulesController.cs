@@ -76,7 +76,7 @@
             return NoContent();           // 204 on success
         }
 
-        // POST /api/admin/week-schedule/exclusions
+        // POST /api/admin/week-schedules/exclusions
         [HttpPost("exclusions")]
         public async Task<IActionResult> CreateExclusions([FromBody] CreateExclusionsDto dto, CancellationToken ct)
         {
@@ -84,7 +84,7 @@
             return created > 0 ? Ok(new { created }) : Ok(new { created = 0 });
         }
 
-        // GET /api/admin/week-schedule/exclusions?from=2026-01-01&to=2026-01-31
+        // GET /api/admin/week-schedules/exclusions?from=2026-01-01&to=2026-01-31
         [HttpGet]
         public async Task<IActionResult> GetExclusions([FromQuery] string? from, [FromQuery] string? to, CancellationToken ct)
         {
@@ -101,6 +101,14 @@
                 End = x.End?.ToString(@"hh\:mm"),
                 x.Reason
             }));
+        }
+
+        // DELETE /api/admin/week-schedules/exclusions/{id}
+        [HttpDelete("exclusions/{id}")]
+        public async Task<IActionResult> DeleteExclusion([FromRoute] string id, CancellationToken ct)
+        {
+            var ok = await exclusionService.DeleteAsync(id, ct);
+            return ok ? NoContent() : NotFound();
         }
 
         // TODO: Move to DoctorsController (api/admin/doctors)
