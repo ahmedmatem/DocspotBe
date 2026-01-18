@@ -69,6 +69,8 @@ namespace DocSpot.Core.Services
                 });
             }
 
+            // Use Upsert-like behavior: ignore duplicates by unique index
+            // For SQL Server, we can try bulk add and discard conflicts (catch unique violations).
             await repository.AddRangeAsync(toInsert, ct);
             try
             {
@@ -103,7 +105,14 @@ namespace DocSpot.Core.Services
 
         public Task<List<ScheduleExclusion>> GetAsync(DateOnly? from, DateOnly? to, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var q = repository.AllReadOnly<ScheduleExclusion>();
+            if (from.HasValue) q = q.Where(x => x.Date >= from.Value);
+            if (to.HasValue) q = q.Where(x => x.Date <= to.Value);
+            return q.OrderBy(x => x.Date)
+                    .ThenBy(x => x.ExclusionType)
+                    .ThenBy(x => x.Start)
+                    .ToListAsync(ct);
+
         }
 
         public bool IsSlotExcluded(DateOnly date, TimeSpan start, TimeSpan end, IReadOnlyList<ScheduleExclusion> exclusions)
