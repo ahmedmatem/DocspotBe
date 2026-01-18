@@ -36,6 +36,7 @@ namespace DocSpot.Infrastructure.Data
             //// entity configurations
             //builder.ApplyConfiguration(new DoctorEntityConfiguration());
             //builder.ApplyConfiguration(new PatientEntityConfiguration());
+            builder.ApplyConfiguration(new ScheduleExclusionConfiguration());
             builder.ApplyConfiguration(new AppointmentConfiguration());
             builder.ApplyConfiguration(new WeekScheduleCfg());
             builder.ApplyConfiguration(new WeekScheduleIntervalCfg());
@@ -51,6 +52,8 @@ namespace DocSpot.Infrastructure.Data
         public DbSet<WeekSchedule> WeekSchedules { get; set; }
 
         public DbSet<WeekScheduleInterval> WeekScheduleIntervals { get; set; }
+
+        public DbSet<ScheduleExclusion> ScheduleExclusions { get; set; }
 
         public DbSet<Appointment> Appointments { get; set; }
 
