@@ -1,23 +1,19 @@
 ﻿using DocSpot.Core.Contracts;
 using DocSpot.Core.Models;
 using DocSpot.Core.Models.Req.Appointment;
-using DocSpot.Infrastructure.Data.Repository;
-using DocSpot.Infrastructure.Data.Types;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DocSpot.WebAPI.Controllers.Api
+namespace DocSpot.WebAPI.Areas.Admin.Controllers.Api
 {
-    [ApiController]
+    // api/admin/appointments
     [Route("api/admin/appointments")]
-    [Authorize(Roles = Role.Admin)]
-    public class AdminAppointmentsController : ControllerBase
+    public class AppointmentsController : BaseAdminController
     {
-        private readonly ILogger<AdminAppointmentsController> logger;
+        private readonly ILogger<AppointmentsController> logger;
         private readonly IAppointmentsService appointmentService;
 
-        public AdminAppointmentsController(
-            ILogger<AdminAppointmentsController> _logger,
+        public AppointmentsController(
+            ILogger<AppointmentsController> _logger,
             IAppointmentsService service)
         {
             logger = _logger;

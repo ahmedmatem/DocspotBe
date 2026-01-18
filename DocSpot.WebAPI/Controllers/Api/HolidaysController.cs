@@ -1,6 +1,5 @@
 ﻿using DocSpot.Infrastructure.Data.Models;
 using DocSpot.Infrastructure.Data.Repository;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +20,8 @@ namespace DocSpot.WebAPI.Controllers.Api
             logger = _logger;
         }
 
-        [HttpGet("{year:int}")]
+        // GET /api/holidays/year/2026
+        [HttpGet("year/{year:int}")]
         public async Task<ActionResult<IEnumerable<string>>> GetByYear(int year, CancellationToken ct)
         {
             var start = new DateOnly(year, 1, 1);
@@ -38,11 +38,12 @@ namespace DocSpot.WebAPI.Controllers.Api
             return Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
         }
 
+        // GET /api/holidays/upcoming?months=12
         [HttpGet("upcoming")]
-        public async Task<ActionResult<IEnumerable<string>>> GetUpcoming(CancellationToken ct)
+        public async Task<ActionResult<IEnumerable<string>>> GetUpcoming([FromQuery] int months = 12, CancellationToken ct = default)
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
-            var end = today.AddYears(1);
+            var end = today.AddMonths(months);
             var dates = await repository.AllReadOnly<Holiday>()
                 .Where(h => today <= h.Date && h.Date <= end && h.CountryCode == "BG")
                 .Select(h => h.Date)
@@ -54,9 +55,8 @@ namespace DocSpot.WebAPI.Controllers.Api
             return Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
         }
 
-        [HttpGet]
-        // Frontend calls:
         // GET /api/holidays?from=2026-01-01&to=2026-12-31
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<string>>> GetRange(
             [FromQuery] DateOnly from,
             [FromQuery] DateOnly to,

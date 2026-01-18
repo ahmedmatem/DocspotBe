@@ -9,11 +9,9 @@
     using DocSpot.Core.Models.Req.Appointment;
     using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Mvc;
-    using System.Globalization;
 
-    [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = Role.Patient)]
+    [Route("api/appointments")]
     public class AppointmentsController : ControllerBase
     {
         private readonly ILogger<AppointmentsController> logger;
@@ -56,9 +54,9 @@
         //    return Ok(occupiedSlotsInRange);
         //}
 
-        [HttpGet("time-slots")]
-        public async Task<IActionResult> GetSlots(
-            [FromQuery] string date, CancellationToken ct)
+        // GET /api/appointments/2026-01-18/slots
+        [HttpGet("{date}/slots")]
+        public async Task<IActionResult> GetSlots([FromRoute] string date, CancellationToken ct)
         {
             try
             {
@@ -87,8 +85,9 @@
             }
         }
 
-        [HttpPost("book")]
-        public async Task<IActionResult> Book(AppointmentViewModel model, CancellationToken ct)
+        // POST /api/appointments
+        [HttpPost]
+        public async Task<IActionResult> Create(AppointmentViewModel model, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
@@ -118,7 +117,9 @@
         /// <param name="ct">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>An <see cref="IActionResult"/> containing the cancellation preview details if the request is valid;
         /// otherwise, a bad request result if the appointment ID or token is invalid.</returns>
-        [HttpGet("cancel-preview")]
+
+        // GET /api/appointments/cancellation/preview?id=...&token=...
+        [HttpGet("cancellation/preview")]
         public async Task<IActionResult> GetCancelPreviewAsync([FromQuery] AppointmentPublicReq req, CancellationToken ct)
         {
             var appt = await appointmentsService.GetCancelPreviewAsync(req, ct);
@@ -128,7 +129,8 @@
                 : Ok(appt);
         }
 
-        [HttpGet("public/cancel")]
+        // POST /api/appointments/cancellation/preview?id=...&token=...
+        [HttpPost("cancellation")]
         public async Task<IActionResult> CancelAsync([FromQuery] AppointmentPublicReq req, CancellationToken ct)
         {
             var result = await appointmentsService.CancelAsync(req, ct);
