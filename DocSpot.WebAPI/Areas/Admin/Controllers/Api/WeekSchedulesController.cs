@@ -1,5 +1,7 @@
 ﻿namespace DocSpot.WebAPI.Areas.Admin.Controllers.Api
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using DocSpot.Core.Contracts;
     using DocSpot.Core.Exceptions;
     using DocSpot.Core.Extensions;
@@ -10,6 +12,7 @@
     using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
 
     // api/admin/week-schedules
     [Route("api/admin/week-schedules")]
@@ -19,16 +22,22 @@
         private readonly PasswordHasher<IdentityUser> passwordHasher;
         private readonly IDoctorService doctorService;
         private readonly IScheduleService scheduleService;
+        private readonly IExclusionService exclusionService;
+        private readonly IMapper mapper;
 
         public WeekSchedulesController(
             UserManager<IdentityUser> _userManager,
             IDoctorService _doctorService,
-            IScheduleService _scheduleService)
+            IScheduleService _scheduleService,
+            IExclusionService _exclusionService,
+            IMapper _mapper)
         {
             userManager = _userManager;
             doctorService = _doctorService;
             passwordHasher = new PasswordHasher<IdentityUser>();
             scheduleService = _scheduleService;
+            exclusionService = _exclusionService;
+            mapper = _mapper;
         }
 
         // GET api/admin/week-schedules
@@ -67,7 +76,34 @@
             return NoContent();           // 204 on success
         }
 
-        // TODO: MOve to DoctorsController (api/admin/doctors)
+        // POST /api/admin/week-schedule/exclusions
+        [HttpPost("exclusions")]
+        public async Task<IActionResult> CreateExclusions([FromBody] CreateExclusionsDto dto, CancellationToken ct)
+        {
+            var created = await exclusionService.CreateBatchAsync(dto, ct);
+            return created > 0 ? Ok(new { created }) : Ok(new { created = 0 });
+        }
+
+        // GET /api/admin/week-schedule/exclusions?from=2026-01-01&to=2026-01-31
+        [HttpGet]
+        public async Task<IActionResult> GetExclusions([FromQuery] string? from, [FromQuery] string? to, CancellationToken ct)
+        {
+            DateOnly? f = null, t = null;
+            if (DateOnly.TryParse(from, out var f2)) f = f2;
+            if (DateOnly.TryParse(to, out var t2)) t = t2;
+            var list = await exclusionService.GetAsync(f, t, ct);
+            return Ok(list.Select(x => new
+            {
+                x.Id,
+                Date = x.Date.ToString("yyyy-MM-dd"),
+                x.ExclusionType,
+                Start = x.Start?.ToString(@"hh\:mm"),
+                End = x.End?.ToString(@"hh\:mm"),
+                x.Reason
+            }));
+        }
+
+        // TODO: Move to DoctorsController (api/admin/doctors)
         [HttpPost("register-doctor")]
         public async Task<IActionResult> RegisterDoctor([FromBody] RegisterModel model)
         {
