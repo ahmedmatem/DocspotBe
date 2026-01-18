@@ -2,6 +2,7 @@
 {
     public sealed class ExclusionDto
     {
+        public required string Id { get; set; }
         public required string Date { get; set; }               // "yyyy-MM-dd"
         public required string ExclusionType { get; set; }      // "Day" | "TimeRange"
         public string? Start { get; set; }                      // "HH:mm" (for TimeRange)

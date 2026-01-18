@@ -31,7 +31,7 @@
 
         Task AddAsync<T>(T entity) where T : class;
 
-        Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class;
+        Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken ct) where T : class;
 
         Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         where T : class;

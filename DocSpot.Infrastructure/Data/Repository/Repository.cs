@@ -57,7 +57,7 @@
             await context.AddAsync<T>(entity);
         }
 
-        public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class
+        public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken ct = default) where T : class
         {
             await DbSet<T>().AddRangeAsync(entities);
         }
