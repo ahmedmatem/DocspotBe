@@ -129,7 +129,7 @@
                 : Ok(appt);
         }
 
-        // POST /api/appointments/cancellation/preview?id=...&token=...
+        // POST /api/appointments/cancellation?id=...&token=...
         [HttpPost("cancellation")]
         public async Task<IActionResult> CancelAsync([FromQuery] AppointmentPublicReq req, CancellationToken ct)
         {
