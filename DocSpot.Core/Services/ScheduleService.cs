@@ -184,6 +184,7 @@ namespace DocSpot.Core.Services
                     {
                         Time = current.ToString(@"hh\:mm"),
                         Available = true,
+                        Length = activeWS.SlotLengthMinutes,
                         // if needed:
                         // DayKey = dayKey,
                         // Date = dateOnly,

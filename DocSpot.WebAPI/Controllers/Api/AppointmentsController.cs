@@ -9,6 +9,8 @@
     using DocSpot.Core.Models.Req.Appointment;
     using DocSpot.Infrastructure.Data.Types;
     using Microsoft.AspNetCore.Mvc;
+    using System;
+    using System.Globalization;
 
     [ApiController]
     [Route("api/appointments")]
@@ -17,6 +19,7 @@
         private readonly ILogger<AppointmentsController> logger;
         private readonly IAppointmentsService appointmentsService;
         private readonly IScheduleService scheduleService;
+        private readonly IExclusionService exclusionService;
         private readonly IEmailService emailService;
         private readonly IMapper mapper;
 
@@ -24,12 +27,14 @@
             ILogger<AppointmentsController> _logger,
             IAppointmentsService _appointmentsService,
             IScheduleService _scheduleService,
+            IExclusionService _exclusionService,
             IEmailService _emailService,
             IMapper _mapper)
         {
             logger = _logger;
             appointmentsService = _appointmentsService;
             scheduleService = _scheduleService;
+            exclusionService = _exclusionService;
             emailService = _emailService;
             mapper = _mapper;
         }
@@ -65,11 +70,29 @@
                 // All appointments in database are booked except those that are cancelled
                 var bookedSlots = appointmentsForDate
                     .Where(a => a.AppointmentStatus != AppointmentStatus.Cancelled)
-                    .Select(a => a.AppointmentTime.ToString("HH:mm"));
+                    .Select(a => a.AppointmentTime.ToString("HH:mm"))
+                    .ToHashSet(StringComparer.Ordinal); // faster contains
 
+                // Parse yyyy-MM-dd safely
+                if (!date.TryParseDateOnlyExact(out var dateOnly))
+                {
+                    return BadRequest(new { error = $"Invalid date: ${date}. Use yyyy-MM-dd." });
+                }
+
+                var exclusions = await exclusionService.GetAsync(dateOnly, dateOnly, ct);
+
+                // Whole-day exclusion -> everything unavailable (return Ok([]))
+                if (exclusions.Any(e => e.ExclusionType == ExclusionType.Day))
+                {
+                    return Ok(Array.Empty<SlotDto>());
+                    // or set all slots as unavailable
+                    //foreach (var s in slotsForDate) s.Available = false;
+                    //return Ok(slotsForDate);
+                }
+
+                // Set passed and booked slots as unavailable
                 foreach (var slot in slotsForDate)
                 {
-
                     if ((date.IsToday() && slot.Time.IsTimePassed()) ||
                         bookedSlots.Contains(slot.Time))
                     {
@@ -77,7 +100,15 @@
                     }
                 }
 
-                return Ok(slotsForDate);
+                // Filter excluded slots
+                var filtered = slotsForDate.Where(s =>
+                {
+                    var start = TimeSpan.ParseExact(s.Time, @"hh\:mm", CultureInfo.InvariantCulture);
+                    var end = start.Add(TimeSpan.FromMinutes(s.Length));
+                    return !exclusionService.IsSlotExcluded(dateOnly, start, end, exclusions);
+                });
+
+                return Ok(filtered);
             }
             catch (ScheduleValidationException ex)
             {
