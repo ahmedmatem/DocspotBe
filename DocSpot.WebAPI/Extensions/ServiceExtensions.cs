@@ -24,6 +24,7 @@ namespace DocSpot.WebAPI.Extensions
             services.AddScoped<IDoctorService, DoctorService>();
             services.AddScoped<IAppointmentsService, AppointmentsService>();
             services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IExclusionService, ExclusionService>();
 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped<IEmailService, EmailService>();
@@ -71,9 +72,9 @@ namespace DocSpot.WebAPI.Extensions
         public static IServiceCollection AddApplicationDbContext(
             this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection") 
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            
+
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 //options.UseSqlServer(connectionString);
@@ -87,7 +88,8 @@ namespace DocSpot.WebAPI.Extensions
 
         public static IServiceCollection AddApplicationIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<IdentityUser, IdentityRole>(options => {
+            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
                 options.SignIn.RequireConfirmedAccount = false;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
