@@ -85,7 +85,7 @@
         }
 
         // GET /api/admin/week-schedules/exclusions?from=2026-01-01&to=2026-01-31
-        [HttpGet]
+        [HttpGet("exclusions")]
         public async Task<IActionResult> GetExclusions([FromQuery] string? from, [FromQuery] string? to, CancellationToken ct)
         {
             DateOnly? f = null, t = null;
