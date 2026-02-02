@@ -248,20 +248,21 @@
 
         public async Task<AdminActionResult> AdminCancelAsync(string id, AdminAppointmentsActionReq.CancelAppointmentReq req, CancellationToken ct)
         {
-            //var appt = await repository.AllReadOnly<Appointment>()
-            //    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, ct);
-            //if (appt is null) return AdminActionResult.NotFound;
+            var appt = await repository.All<Appointment>().FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, ct);
+            if (appt is null) return AdminActionResult.NotFound;
 
-            //if (appt.AppointmentStatus == AppointmentStatus.Cancelled)
-            //    return AdminActionResult.Success;
+            if (appt.AppointmentStatus == AppointmentStatus.Cancelled)
+                return AdminActionResult.Success;
 
-            //appt.AppointmentStatus = AppointmentStatus.Cancelled;
-            //appt.CancelReason = req.Reason?.Trim();
-            //appt.CancelledAt = DateTime.UtcNow;
-            //appt.CancelledByAdminId = _current.UserId;
+            appt.AppointmentStatus = AppointmentStatus.Cancelled;
+            appt.CancelReason = req.Reason?.Trim();
+            appt.CancelledAtUtc = DateTime.UtcNow;
+            appt.CancelledByAdmin = true;
 
-            //await _db.SaveChangesAsync(ct);
+            repository.Update(appt);
+            await repository.SaveChangesAsync<Appointment>(ct);
 
+            // send or not email notification
             //if (req.NotifyPatient && !string.IsNullOrWhiteSpace(appt.PatientEmail))
             //{
             //    await _email.SendAppointmentCancelledAsync(
@@ -270,6 +271,79 @@
             //        appt.AppointmentDate,
             //        appt.AppointmentTime,
             //        appt.CancelReason,
+            //        ct);
+            //}
+
+            return AdminActionResult.Success;
+        }
+
+        public async Task<AdminActionResult> DeleteAsync(string id, CancellationToken ct)
+        {
+            var appt = await repository.All<Appointment>().FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, ct);
+            if (appt is null) return AdminActionResult.NotFound;
+
+            if (appt.AppointmentStatus != AppointmentStatus.Cancelled)
+                return AdminActionResult.Conflict;
+
+            appt.IsDeleted = true;
+            appt.DeletedOn = DateTime.UtcNow;
+
+            repository.Update(appt);
+            await repository.SaveChangesAsync<Appointment>(ct);
+
+            return AdminActionResult.Success;
+        }
+
+        public async Task<AdminActionResult> RescheduleAsync(string id, AdminAppointmentsActionReq.RescheduleAppointmentReq req, CancellationToken ct)
+        {
+            var appt = await repository.All<Appointment>().FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, ct);
+            if (appt is null) return AdminActionResult.NotFound;
+
+            if (appt.AppointmentStatus == AppointmentStatus.Cancelled)
+                return AdminActionResult.Conflict;
+            
+            if (!DateOnly.TryParseExact(req.NewDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var newDate))
+                return AdminActionResult.Failed;
+
+            if (!TimeOnly.TryParseExact(req.NewTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var newTime))
+                return AdminActionResult.Failed;
+
+            // past check (adapt to your timezone rules)
+            var nowLocal = DateTime.Now;
+            var newDateTimeLocal = newDate.ToDateTime(newTime);
+            if (newDateTimeLocal <= nowLocal)
+                return AdminActionResult.Conflict;
+
+            // slot availability check
+            var slotTaken = await repository.All<Appointment>().AnyAsync(x =>
+                !x.IsDeleted &&
+                x.Id != id &&
+                x.AppointmentDate == newDate &&
+                x.AppointmentTime == newTime &&
+                x.AppointmentStatus != AppointmentStatus.Cancelled, ct);
+
+            if (slotTaken) return AdminActionResult.Conflict;
+
+            // update
+            appt.CancelReason = req.Reason?.Trim();
+            appt.CancelledAtUtc = DateTime.UtcNow;
+            appt.CancelledByAdmin = true;
+
+            appt.AppointmentDate = newDate;
+            appt.AppointmentTime = newTime;
+
+            repository.Update(appt);
+            await repository.SaveChangesAsync<Appointment>(ct);
+
+            // send or not email notification
+            //if (req.NotifyPatient && !string.IsNullOrWhiteSpace(appt.PatientEmail))
+            //{
+            //    await _email.SendAppointmentRescheduledAsync(
+            //        appt.PatientEmail,
+            //        appt.PatientName,
+            //        appt.AppointmentDate,
+            //        appt.AppointmentTime,
+            //        appt.RescheduleReason,
             //        ct);
             //}
 

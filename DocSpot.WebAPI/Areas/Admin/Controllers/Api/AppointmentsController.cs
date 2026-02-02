@@ -31,6 +31,7 @@ namespace DocSpot.WebAPI.Areas.Admin.Controllers.Api
             return Ok(items);
         }
 
+        // POST /api/admin/appointments/{id}/cancel
         [HttpPost("{id}/cancel")]
         public async Task<IActionResult> Cancel(string id, [FromBody] CancelAppointmentReq req, CancellationToken ct)
         {
@@ -41,7 +42,37 @@ namespace DocSpot.WebAPI.Areas.Admin.Controllers.Api
                 AdminActionResult.NotFound => NotFound("Часът не е намерен."),
                 AdminActionResult.Conflict => Conflict("Часът не може да бъде отменен."),
                 AdminActionResult.Success => Ok("Часът е отменен."),
-                _ => BadRequest("Грешка при отмяна на час.")
+                _ => BadRequest("Грешка при отмяна.")
+            };
+        }
+
+        // DELETE /api/admin/appointments/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id, CancellationToken ct)
+        {
+            var result = await _service.DeleteAsync(id, ct);
+
+            return result switch
+            {
+                AdminActionResult.NotFound => NotFound("Часът не е намерен."),
+                AdminActionResult.Conflict => Conflict("Само отменени часове могат да бъдат изтрити."),
+                AdminActionResult.Success => Ok("Часът е изтрит."),
+                _ => BadRequest("Грешка при изтриване.")
+            };
+        }
+
+        // POST /api/admin/appointments/{id}/reschedule
+        [HttpPost("{id}/reschedule")]
+        public async Task<IActionResult> Reschedule(string id, [FromBody] RescheduleAppointmentReq req, CancellationToken ct)
+        {
+            var result = await _service.RescheduleAsync(id, req, ct);
+
+            return result switch
+            {
+                AdminActionResult.NotFound => NotFound("Часът не е намерен."),
+                AdminActionResult.Conflict => Conflict("Слотът е зает или часът не може да се запази."),
+                AdminActionResult.Success => Ok("Часът е презаписан.."),
+                _ => BadRequest("Грешка при презаписване на час.")
             };
         }
     }

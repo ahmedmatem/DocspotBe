@@ -54,5 +54,9 @@
         public Task<IReadOnlyCollection<AdminAppointmentDto>> GetList(AdminAppointmentsReq req, CancellationToken ct);
 
         Task<AdminActionResult> AdminCancelAsync(string id, CancelAppointmentReq req, CancellationToken ct);
+
+        Task<AdminActionResult> DeleteAsync(string id, CancellationToken ct);
+        
+        Task<AdminActionResult> RescheduleAsync(string id, RescheduleAppointmentReq req, CancellationToken ct);
     }
 }
