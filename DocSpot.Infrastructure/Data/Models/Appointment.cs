@@ -32,6 +32,10 @@
         // Cancel token
         public string? CancelTokenHash { get; set; }
 
+        public string? CancelReason { get; set; }
+
+        public bool CancelledByAdmin { get; set; }
+
         public DateTime? CancelTokenExpireAtUtc { get; set; }
 
         public DateTime? CancelledAtUtc { get; set; }

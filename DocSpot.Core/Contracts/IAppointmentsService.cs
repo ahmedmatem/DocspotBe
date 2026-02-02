@@ -2,8 +2,9 @@
 {
     using DocSpot.Core.Models;
     using DocSpot.Core.Models.Req.Appointment;
-    using DocSpot.Infrastructure.Data.Models;
     using DocSpot.Infrastructure.Data.Types;
+    using static DocSpot.Core.Models.ActionResult;
+    using static DocSpot.Core.Models.Req.Appointment.AdminAppointmentsActionReq;
 
     public interface IAppointmentsService
     {
@@ -51,5 +52,7 @@
         public Task<IReadOnlyList<AppointmentDto>> GetAllByDateAsync(string dateStr, CancellationToken ct);
 
         public Task<IReadOnlyCollection<AdminAppointmentDto>> GetList(AdminAppointmentsReq req, CancellationToken ct);
+
+        Task<AdminActionResult> AdminCancelAsync(string id, CancelAppointmentReq req, CancellationToken ct);
     }
 }

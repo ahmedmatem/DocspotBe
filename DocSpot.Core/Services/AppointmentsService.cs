@@ -17,6 +17,7 @@
     using static DocSpot.Core.Constants;
     using static DocSpot.Core.Helpers.TimeHelper;
     using static DocSpot.Core.Helpers.TokenHelper;
+    using static DocSpot.Core.Models.ActionResult;
 
     public class AppointmentsService : IAppointmentsService
     {
@@ -243,6 +244,36 @@
                 .ThenBy(x => x.AppointmentTime)
                 .ProjectTo<AdminAppointmentDto>(mapper.ConfigurationProvider)
                 .ToListAsync(ct);
+        }
+
+        public async Task<AdminActionResult> AdminCancelAsync(string id, AdminAppointmentsActionReq.CancelAppointmentReq req, CancellationToken ct)
+        {
+            //var appt = await repository.AllReadOnly<Appointment>()
+            //    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, ct);
+            //if (appt is null) return AdminActionResult.NotFound;
+
+            //if (appt.AppointmentStatus == AppointmentStatus.Cancelled)
+            //    return AdminActionResult.Success;
+
+            //appt.AppointmentStatus = AppointmentStatus.Cancelled;
+            //appt.CancelReason = req.Reason?.Trim();
+            //appt.CancelledAt = DateTime.UtcNow;
+            //appt.CancelledByAdminId = _current.UserId;
+
+            //await _db.SaveChangesAsync(ct);
+
+            //if (req.NotifyPatient && !string.IsNullOrWhiteSpace(appt.PatientEmail))
+            //{
+            //    await _email.SendAppointmentCancelledAsync(
+            //        appt.PatientEmail,
+            //        appt.PatientName,
+            //        appt.AppointmentDate,
+            //        appt.AppointmentTime,
+            //        appt.CancelReason,
+            //        ct);
+            //}
+
+            return AdminActionResult.Success;
         }
     }
 }
